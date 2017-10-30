@@ -9,4 +9,9 @@ package edu.cpp.cs.cs141.final_prog_assgment;
  */
 public class Items extends Entities{
 
+	public static enum ItemType{BRIEFCASE, RADAR, BULLET, INVINC};
+	
+	public Items() {
+		
+	}
 }
