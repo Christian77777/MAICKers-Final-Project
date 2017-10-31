@@ -11,6 +11,11 @@ public class Items extends Entities
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4403682892293323135L;
+
+	/**
 	 * Possible Types of Items
 	 */
 	public static enum ItemType
@@ -22,7 +27,7 @@ public class Items extends Entities
 
 	public Items(ItemType t)
 	{
-		super(x, y);
+		super();
 		this.type = t;
 		if (t == ItemType.BRIEFCASE)
 		{
@@ -38,5 +43,14 @@ public class Items extends Entities
 	public void move(char direction)
 	{
 		throw new IllegalArgumentException();
+	}
+
+	@Override
+	public boolean isSpawnableHere()
+	{
+		getX();
+		getY();
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

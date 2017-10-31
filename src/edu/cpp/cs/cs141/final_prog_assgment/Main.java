@@ -10,11 +10,13 @@ package edu.cpp.cs.cs141.final_prog_assgment;
 public class Main {
 
 	/**
-	 * @param args
+	 * Start the Program/Game
+	 * @param args from commands to enable the gui
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		GameEngine engine = new GameEngine();
+		engine.newGame();
+		
 	}
 
 }

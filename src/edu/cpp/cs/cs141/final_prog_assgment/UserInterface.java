@@ -18,7 +18,7 @@ public class UserInterface {
 	}
 	
 	/**
-	 * Display Welcome Message, and allow Main Menu Option
+	 * Display Welcome Message, and return a Main Menu Option
 	 */
 	public int welcomeMessage()
 	{
@@ -37,7 +37,7 @@ public class UserInterface {
 	 */
 	public int pickTurn()
 	{
-		
+		return 0;
 	}
 	
 	/**
@@ -54,5 +54,32 @@ public class UserInterface {
 	public void printShotResult()
 	{
 		
+	}
+	
+	/**
+	 * Print warning message that the player lost a life, and returned to 0,0
+	 */
+	public void printDamaged()
+	{
+		
+	}
+	
+	/**
+	 * Print a query for the Difficulty to play the game at
+	 * @return the selected difficulty
+	 */
+	public int offerDifficulty()
+	{
+		return 0;
+	}
+	
+	public char queryShootingDirection()
+	{
+		return 'a';
+	}
+	
+	public void printMap(Entities[][] map, char lookDirection, boolean debug)
+	{
+		System.out.println(map[0][0]);
 	}
 }
