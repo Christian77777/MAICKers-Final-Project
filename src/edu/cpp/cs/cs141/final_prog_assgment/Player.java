@@ -9,4 +9,10 @@ package edu.cpp.cs.cs141.final_prog_assgment;
  */
 public class Player extends Entities{
 
+	public Player()
+	{
+		super(0,0);
+	}
+	
+	
 }
