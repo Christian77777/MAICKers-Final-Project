@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import edu.cpp.cs.cs141.final_prog_assgment.Items.ItemType;
 
 /**
- * This Class contains all the Data for a Save Game. Creating this Object also creates all necessary Entities,
- *  and provides a Matrix Representation of the Map.
- *  Also Keeps Track of the Turn Count of the active Game
+ * This Class contains all the Data for a Save Game. Creating this Object also
+ * creates all necessary Entities, and provides a Matrix Representation of the
+ * Map. Also Keeps Track of the Turn Count of the active Game
  */
-public class GameBoard implements Serializable
-{
+public class GameBoard implements Serializable {
 	/**
 	 * 
 	 */
@@ -45,56 +44,43 @@ public class GameBoard implements Serializable
 	private int turnCount = 0;
 
 	/**
-	 * Puts Enemy in possible spaces
-	 * Places Items in possible spaces
+	 * Puts Enemy in possible spaces Places Items in possible spaces
 	 */
-	public GameBoard()
-	{
+	public GameBoard() {
 		Ninja enemy;
-		for (int x = 0; x < 6; x++)
-		{
-			do
-			{
+		for (int x = 0; x < 6; x++) {
+			do {
 				enemy = new Ninja();
-			}
-			while (!enemy.isSpawnableHere() && isSharingHere(enemy.getX(), enemy.getY()));
+			} while (!enemy.isSpawnableHere() && isSharingHere(enemy.getX(), enemy.getY()));
 			enemies.add(enemy);
 		}
 
 		Items temp;
-		do
-		{
+		do {
 			temp = new Items(ItemType.BRIEFCASE);
-		}
-		while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
+		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
 		items.add(temp);
-		do
-		{
+		do {
 			temp = new Items(ItemType.BULLET);
-		}
-		while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
+		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
 		items.add(temp);
-		do
-		{
+		do {
 			temp = new Items(ItemType.INVINC);
-		}
-		while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
+		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
 		items.add(temp);
-		do
-		{
+		do {
 			temp = new Items(ItemType.RADAR);
-		}
-		while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
+		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
 		items.add(temp);
 	}
-	
+
 	/**
-	 * Create a Matrix Representation of the Map to display
-	 * For every Entity stored, get the x and y position, and match it to a slot in the Matrix
+	 * Create a Matrix Representation of the Map to display For every Entity stored,
+	 * get the x and y position, and match it to a slot in the Matrix
+	 * 
 	 * @return a Matrix form of the Map
 	 */
-	public Entities[][] getMap()
-	{
+	public Entities[][] getMap() {
 		Entities[][] map = new Entities[9][9];
 		int x = player.getX();
 		int y = player.getY();
@@ -103,30 +89,32 @@ public class GameBoard implements Serializable
 	}
 
 	/**
-	 * Does any other entity share a space here (TBD what entities need to be concidered)
-	 * @param x the horizontal value
-	 * @param y the vertical value
+	 * Does any other entity share a space here (TBD what entities need to be
+	 * concidered)
+	 * 
+	 * @param x
+	 *            the horizontal value
+	 * @param y
+	 *            the vertical value
 	 * @return if Sharing a Spot
 	 */
-	public boolean isSharingHere(int x, int y)
-	{
+	public boolean isSharingHere(int x, int y) {
 		return false;
 	}
 
 	/**
 	 * @return the Turn Count
 	 */
-	public int getTurnCount()
-	{
+	public int getTurnCount() {
 		return turnCount;
 	}
-	
+
 	/**
 	 * Increase Turn Count by one
+	 * 
 	 * @return the new number of Turns
 	 */
-	public int incrementTurns()
-	{
+	public int incrementTurns() {
 		turnCount++;
 		return turnCount;
 	}
@@ -134,24 +122,21 @@ public class GameBoard implements Serializable
 	/**
 	 * @return the player
 	 */
-	public Player getPlayer()
-	{
+	public Player getPlayer() {
 		return player;
 	}
 
 	/**
 	 * @return the enemies
 	 */
-	public ArrayList<Ninja> getEnemies()
-	{
+	public ArrayList<Ninja> getEnemies() {
 		return enemies;
 	}
 
 	/**
 	 * @return the items
 	 */
-	public ArrayList<Items> getItems()
-	{
+	public ArrayList<Items> getItems() {
 		return items;
 	}
 }

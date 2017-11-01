@@ -18,8 +18,7 @@ package edu.cpp.cs.cs141.final_prog_assgment;
 /**
  * This Class Represents Powerups or the Briefcase in the GameBoard
  */
-public class Items extends Entities
-{
+public class Items extends Entities {
 
 	/**
 	 * 
@@ -29,8 +28,7 @@ public class Items extends Entities
 	/**
 	 * Possible Types of Items
 	 */
-	public static enum ItemType
-	{
+	public static enum ItemType {
 		BRIEFCASE, RADAR, BULLET, INVINC
 	};
 
@@ -41,18 +39,16 @@ public class Items extends Entities
 
 	/**
 	 * Create Item of this type
-	 * @param t the Type
+	 * 
+	 * @param t
+	 *            the Type
 	 */
-	public Items(ItemType t)
-	{
+	public Items(ItemType t) {
 		super();
 		this.type = t;
-		if (t == ItemType.BRIEFCASE)
-		{
+		if (t == ItemType.BRIEFCASE) {
 
-		}
-		else
-		{
+		} else {
 
 		}
 	}
@@ -61,45 +57,34 @@ public class Items extends Entities
 	 * @deprecated SHOULD NOT BE CALLED OF A ITEM
 	 */
 	@Override
-	public final void move(char direction)
-	{
+	public final void move(char direction) {
 		throw new IllegalArgumentException();
 	}
 
 	/**
-	 * Decide Where the Item may spawn
-	 * 1. Can not spawn in Room if not a suitcase, or the opposite if a suitcase
-	 * 2. Can not spawn in 0,0
+	 * Decide Where the Item may spawn 1. Can not spawn in Room if not a suitcase,
+	 * or the opposite if a suitcase 2. Can not spawn in 0,0
 	 */
 	@Override
-	public boolean isSpawnableHere()
-	{
+	public boolean isSpawnableHere() {
 		getX();
 		getY();
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	/**
 	 * @return a String representation of this Object
 	 */
 	@Override
-	public String toString()
-	{
-		if(type == ItemType.BRIEFCASE)
-		{
+	public String toString() {
+		if (type == ItemType.BRIEFCASE) {
 			return "B";
-		}
-		else if(type == ItemType.RADAR)
-		{
+		} else if (type == ItemType.RADAR) {
 			return "r";
-		}
-		else if(type == ItemType.BULLET)
-		{
+		} else if (type == ItemType.BULLET) {
 			return "b";
-		}
-		else if(type == ItemType.INVINC)
-		{
+		} else if (type == ItemType.INVINC) {
 			return "i";
 		}
 		return null;

@@ -16,10 +16,10 @@
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 /**
- * This Class represents the User, and their charactor. Decisions for the Player are made in the UI class, and verified by the Game Engine
+ * This Class represents the User, and their charactor. Decisions for the Player
+ * are made in the UI class, and verified by the Game Engine
  */
-public class Player extends Entities
-{
+public class Player extends Entities {
 	/**
 	 * 
 	 */
@@ -32,66 +32,64 @@ public class Player extends Entities
 	 * amount of life player has
 	 */
 	private int life = 3;
-	
+
 	/**
 	 * Sets Player at 0,0 with Max Health and Ammo
 	 */
-	public Player()
-	{
-		super(0,0);
+	public Player() {
+		super(0, 0);
 	}
-	
+
 	/**
 	 * return if the Player is able to shoot
+	 * 
 	 * @return if carrying Ammo
 	 */
-	public boolean hasAmmo()
-	{
+	public boolean hasAmmo() {
 		return ammo;
 	}
+
 	/**
-	 * Either return Ammo to player when over Power up
-	 * Or Remove Ammo from player when shot is used
-	 * @param a if Player should now have ammo
+	 * Either return Ammo to player when over Power up Or Remove Ammo from player
+	 * when shot is used
+	 * 
+	 * @param a
+	 *            if Player should now have ammo
 	 */
-	public void setAmmo(boolean a)
-	{
+	public void setAmmo(boolean a) {
 		ammo = a;
 	}
-	
+
 	/**
 	 * Return what this Entity Is when on the Map
 	 */
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "P";
 	}
-	
+
 	/**
 	 * Reduce Life by one
+	 * 
 	 * @return the new Life Value
 	 */
-	private int loseLife()
-	{
+	private int loseLife() {
 		life--;
-		return life;
-	}
-	
-	/**
-	 * @return the Life the player has
-	 */
-	private int getLife()
-	{
 		return life;
 	}
 
 	/**
-	 * @deprecated Not used for Spawning because space is 0,0  always
+	 * @return the Life the player has
+	 */
+	private int getLife() {
+		return life;
+	}
+
+	/**
+	 * @deprecated Not used for Spawning because space is 0,0 always
 	 */
 	@Override
-	public boolean isSpawnableHere()
-	{
+	public boolean isSpawnableHere() {
 		// TODO Auto-generated method stub
 		return false;
 	}
