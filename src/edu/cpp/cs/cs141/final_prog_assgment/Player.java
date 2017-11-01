@@ -1,11 +1,22 @@
 /**
- * 
+ * CS 141: Intro to Programming and Problem Solving
+ * Professor: Edwin Rodr&iacute;guez
+ *
+ * Programming Assignment #Final
+ *
+ * Small Text Based Game of Spy versus Ninjas, where you get to shoot, move, and look
+ *
+ * Team MAICKers
+ *	Isaiah Britto
+ * 	Angela Gadon
+ * 	Kiana Ziglari
+ * 	Christian Devile
+ * 	Michael John Bradford
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 /**
- * @author kiana
- *
+ * This Class represents the User, and their charactor. Decisions for the Player are made in the UI class, and verified by the Game Engine
  */
 public class Player extends Entities
 {
@@ -13,19 +24,28 @@ public class Player extends Entities
 	 * 
 	 */
 	private static final long serialVersionUID = -2091432889491962930L;
+	/**
+	 * if gun has single shot
+	 */
 	private boolean ammo = true;
+	/**
+	 * amount of life player has
+	 */
 	private int life = 3;
 	
+	/**
+	 * Sets Player at 0,0 with Max Health and Ammo
+	 */
 	public Player()
 	{
 		super(0,0);
 	}
 	
 	/**
-	 * return is the Player is able to shoot
+	 * return if the Player is able to shoot
 	 * @return if carrying Ammo
 	 */
-	private boolean hasAmmo()
+	public boolean hasAmmo()
 	{
 		return ammo;
 	}
@@ -34,7 +54,7 @@ public class Player extends Entities
 	 * Or Remove Ammo from player when shot is used
 	 * @param a if Player should now have ammo
 	 */
-	private void setAmmo(boolean a)
+	public void setAmmo(boolean a)
 	{
 		ammo = a;
 	}
@@ -45,7 +65,7 @@ public class Player extends Entities
 	@Override
 	public String toString()
 	{
-		return "S";
+		return "P";
 	}
 	
 	/**
@@ -66,6 +86,9 @@ public class Player extends Entities
 		return life;
 	}
 
+	/**
+	 * @deprecated Not used for Spawning because space is 0,0  always
+	 */
 	@Override
 	public boolean isSpawnableHere()
 	{
