@@ -16,7 +16,8 @@
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Random;
+
 import edu.cpp.cs.cs141.final_prog_assgment.Items.ItemType;
 
 /**
@@ -29,114 +30,209 @@ public class GameBoard implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -1601258203598047430L;
-	/**
-	 * Player Token
-	 */
-	private Player player = new Player();
-	/**
-	 * List of Enemies, Only the ones left alive
-	 */
-	private ArrayList<Ninja> enemies = new ArrayList<Ninja>();
-	/**
-	 * List of Items, still not grabbed by Player
-	 */
-	private ArrayList<Items> items = new ArrayList<Items>();
-	private int turnCount = 0;
-
+	
+	private String[] board = new String[81];
 	/**
 	 * Puts Enemy in possible spaces Places Items in possible spaces
 	 */
 	public GameBoard() {
-		Ninja enemy;
-		for (int x = 0; x < 6; x++) {
-			do {
-				enemy = new Ninja();
-			} while (!enemy.isSpawnableHere() && isSharingHere(enemy.getX(), enemy.getY()));
-			enemies.add(enemy);
+		for(int i =0; i < board.length; i++) {
+			board[i] = "000";
 		}
-
-		Items temp;
-		do {
-			temp = new Items(ItemType.BRIEFCASE);
-		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
-		items.add(temp);
-		do {
-			temp = new Items(ItemType.BULLET);
-		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
-		items.add(temp);
-		do {
-			temp = new Items(ItemType.INVINC);
-		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
-		items.add(temp);
-		do {
-			temp = new Items(ItemType.RADAR);
-		} while (!temp.isSpawnableHere() && isSharingHere(temp.getX(), temp.getY()));
-		items.add(temp);
+		board[72] = "100"; // The player always starts at spot 72
+		for (int i = 0; i < 6; i++) {
+			placeNinja();
+		}
+		placeItem(ItemType.BRIEFCASE);
+		placeItem(ItemType.RADAR);
+		placeItem(ItemType.INVINC);
+		placeItem(ItemType.BULLET);
+		
 	}
-
+	
 	/**
-	 * Create a Matrix Representation of the Map to display For every Entity stored,
-	 * get the x and y position, and match it to a slot in the Matrix
+	 * quick and dirty printout of the array contents
+	 */
+	public void qPrint() {
+		for(int i = 0; i < board.length; i++) {
+			System.out.println("actual space " + (i + 1) + " array space "+ i + " contains " + board[i]);
+		}		
+	}
+	
+	/**
+	 * quick and dirty printout of data in matrix format
+	 * @param numbered - true if cells should be numbered otherwise false 
+	 */
+	public void displayData(boolean numbered) {
+		int colCount = 1;
+		for(int i = 0; i < board.length; i++)
+		{
+			if(colCount == 9) {
+				if(numbered) {
+					System.out.print("{" + i + " " + board[i] + "}\n");
+				}else {
+					System.out.print("{" + board[i] + "}\n");	
+				}
+				colCount = 1;
+			}
+			else{
+				if(numbered) {
+					System.out.print("{" + i + " " + board[i] + "}");
+				}else {
+					System.out.print("{" + board[i] + "}");	
+				}
+				colCount++;
+			}
+		}
+	}
+	
+	/**
+	 * Places a ninja in a spot on the board, rules for placing are as follows
+	 * 1. Cannot be placed in a room 2. Cannot be placed on another ninja 3. Cannot be placed
+	 * within 3 spaces of the player.
 	 * 
-	 * @return a Matrix form of the Map
+	 * Ninja place in data ("000") string is 3rd, 
+	 * 1 - true ninja is there(001)
+	 * 0 - false no ninja there.(000)
 	 */
-	public Entities[][] getMap() {
-		Entities[][] map = new Entities[9][9];
-		int x = player.getX();
-		int y = player.getY();
-		map[x][y] = player;
-		return null;
+	private void placeNinja() {
+		boolean InvalidSpot = true;
+		Random r = new Random();
+		int num = r.nextInt(81);
+		while(InvalidSpot) {
+			num = r.nextInt(81);
+			if (!isRoom(num)) { 
+				if(!inProxPlayer(num)) { 
+					if(checkFlag(num, 3, '0')) {
+						InvalidSpot = false;
+					}
+				}
+			}
+		}
+		setFlag(num, 3, '1');
 	}
-
+	
 	/**
-	 * Does any other entity share a space here (TBD what entities need to be
-	 * concidered)
+	 * Places an item in a spot on the board, rules for placing are as follows
+	 * 1. Cannot be placed on player 2. Cannot be placed in room if not Briefcase 
+	 * 3. If Briefcase MUST be placed in room 4. Cannot be placed in spot with another item
 	 * 
-	 * @param x
-	 *            the horizontal value
-	 * @param y
-	 *            the vertical value
-	 * @return if Sharing a Spot
+	 * Item place in data ("000") string is 2nd, 
+	 * 0 - No item present (000)
+	 * a - item present is ammo (0a0)
+	 * i - item present is invincibility (0i0)
+	 * r - item present is radar (0r0)
+	 * b - item present is Briefcase (0b0)
 	 */
-	public boolean isSharingHere(int x, int y) {
-		return false;
+	private void placeItem(ItemType type) {
+		boolean InvalidSpot = true;
+		Random r = new Random();
+		int num = r.nextInt(81);
+		if(type == ItemType.BRIEFCASE) {
+			num = r.nextInt(9);
+			switch (num) {
+			case 0:
+				setFlag(10, 2, 'b');
+				break;
+			case 1:
+				setFlag(13, 2, 'b');
+				break;
+			case 2:
+				setFlag(16, 2, 'b');
+				break;
+			case 3:
+				setFlag(37, 2, 'b');
+				break;
+			case 4:
+				setFlag(40, 2, 'b');
+				break;
+			case 5:
+				setFlag(43, 2, 'b');
+				break;
+			case 6:
+				setFlag(64, 2, 'b');
+				break;
+			case 7:
+				setFlag(67, 2, 'b');
+				break;
+			case 8:
+				setFlag(70, 2, 'b');
+				break;
+			}
+		} else {
+			while(InvalidSpot) {			
+				num = r.nextInt(81);
+				if (!isRoom(num)) { 
+					if(!checkFlag(num, 2, 'a') && !checkFlag(num, 2, 'i') && !checkFlag(num, 2, 'r')) { 
+						InvalidSpot = false;
+					}
+				}
+			}
+			switch (type) {
+			case BULLET:
+				setFlag(num, 2, 'a');
+				break;
+			case INVINC:
+				setFlag(num, 2, 'i');
+				break;
+			case RADAR:
+				setFlag(num, 2, 'r');
+				break;				
+			}
+		}
+	}
+	
+	/**
+	 * Takes the board value at spot of three characters and sets the char at flagNumber to i.
+
+	 * @param spot - spot on board to be changed.
+	 * @param flagNumber - which flag to set 1-3
+	 * @param i - what to set flag to.
+	 */
+	private void setFlag(int spot, int flagNumber, char i) {
+		char tmp1 = board[spot].charAt(0);
+		char tmp2 = board[spot].charAt(1);
+		char tmp3 = board[spot].charAt(2);
+		if(flagNumber == 1) {
+			board[spot] = "" + i + tmp2 + tmp3;
+		}else if (flagNumber == 2) {
+			board[spot] = "" + tmp1 + i + tmp3;
+		}else
+			board[spot] = "" + tmp1 + tmp2 + i;
+	}
+	
+	/**
+	 * Checks flagNumber at spot on the board to see if it equals i.
+
+	 * @param spot - spot on board to be checked.
+	 * @param flagNumber - which flag to check 1-3
+	 * @param i - what to compare the flag to
+	 * @return true - if flag == i otherwise false
+	 */
+	private boolean checkFlag(int spot, int flagNumber, char i)
+	{
+		return (board[spot].charAt(flagNumber - 1) == i);
 	}
 
 	/**
-	 * @return the Turn Count
+	 * checks if spot in array is in proximity
+	 * to the player (within 3 spaces).
+	 * @param i - the spot to check
 	 */
-	public int getTurnCount() {
-		return turnCount;
+	private boolean inProxPlayer(int i) {
+		if(i == 72 || i == 73 || i == 74 || i == 63 || i == 54 || i == 64) {
+			return true;
+		}else
+			return false;
 	}
-
 	/**
-	 * Increase Turn Count by one
-	 * 
-	 * @return the new number of Turns
+	 * checks if spot in array is a room.
+	 * @param i - the spot to check
 	 */
-	public int incrementTurns() {
-		turnCount++;
-		return turnCount;
-	}
-
-	/**
-	 * @return the player
-	 */
-	public Player getPlayer() {
-		return player;
-	}
-
-	/**
-	 * @return the enemies
-	 */
-	public ArrayList<Ninja> getEnemies() {
-		return enemies;
-	}
-
-	/**
-	 * @return the items
-	 */
-	public ArrayList<Items> getItems() {
-		return items;
+	private boolean isRoom(int i){			
+		if(i == 10 || i == 13 || i == 16 || i == 37 || i == 40 || i == 43 || i == 64 || i == 67 || i == 70) {
+			return true;
+		}else
+			return false;
 	}
 }
