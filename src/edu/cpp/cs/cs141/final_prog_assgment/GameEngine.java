@@ -142,6 +142,19 @@ public class GameEngine {
 	 * @return if ninjas stabbed player
 	 */
 	public boolean attemptNinjaStab() {
+		//possible way to see if a ninja stabs a player
+		//it would require making a player object and an array of ninja objects of course
+		//wanted to see if this was okay or if there's a better way to do it
+		int playerX = player.getX();
+		int playerY = player.getY();
+		for (Ninja n : ninja) {
+			ninjaX = n.getX();
+			ninjaY = n.getY();
+			if (ninjaX==playerX && (ninjaY-playerY==-1 || ninjaY-playerY==1)
+				return true;
+			else if(ninjaY==playerY && (ninjaX-plyerX==-1 || ninjaY-playerY==1))
+				return true;
+		}
 		return false;
 	}
 
