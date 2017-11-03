@@ -150,7 +150,7 @@ public class GameEngine {
 		for (Ninja n : ninja) {
 			ninjaX = n.getX();
 			ninjaY = n.getY();
-			if (ninjaX==playerX && (ninjaY-playerY==-1 || ninjaY-playerY==1)
+			if (ninjaX==playerX && (ninjaY-playerY==-1 || ninjaY-playerY==1))
 				return true;
 			else if(ninjaY==playerY && (ninjaX-plyerX==-1 || ninjaY-playerY==1))
 				return true;
