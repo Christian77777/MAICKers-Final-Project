@@ -51,42 +51,6 @@ public class GameBoard implements Serializable {
 	}
 	
 	/**
-	 * quick and dirty printout of the array contents
-	 */
-	public void qPrint() {
-		for(int i = 0; i < board.length; i++) {
-			System.out.println("actual space " + (i + 1) + " array space "+ i + " contains " + board[i]);
-		}		
-	}
-	
-	/**
-	 * quick and dirty printout of data in matrix format
-	 * @param numbered - true if cells should be numbered otherwise false 
-	 */
-	public void displayData(boolean numbered) {
-		int colCount = 1;
-		for(int i = 0; i < board.length; i++)
-		{
-			if(colCount == 9) {
-				if(numbered) {
-					System.out.print("{" + i + " " + board[i] + "}\n");
-				}else {
-					System.out.print("{" + board[i] + "}\n");	
-				}
-				colCount = 1;
-			}
-			else{
-				if(numbered) {
-					System.out.print("{" + i + " " + board[i] + "}");
-				}else {
-					System.out.print("{" + board[i] + "}");	
-				}
-				colCount++;
-			}
-		}
-	}
-	
-	/**
 	 * Places a ninja in a spot on the board, rules for placing are as follows
 	 * 1. Cannot be placed in a room 2. Cannot be placed on another ninja 3. Cannot be placed
 	 * within 3 spaces of the player.
