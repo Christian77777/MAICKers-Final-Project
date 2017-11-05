@@ -193,7 +193,7 @@ public class GameBoard implements Serializable {
 	 * checks if spot in array is a room.
 	 * @param i - the spot to check
 	 */
-	private boolean isRoom(int i){			
+	protected boolean isRoom(int i){			
 		if(i == 10 || i == 13 || i == 16 || i == 37 || i == 40 || i == 43 || i == 64 || i == 67 || i == 70) {
 			return true;
 		}else
