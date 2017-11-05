@@ -153,7 +153,7 @@ public class GameBoard implements Serializable {
 	 * @param flagNumber - which flag to set 1-3
 	 * @param i - what to set flag to.
 	 */
-	private void setFlag(int spot, int flagNumber, char i) {
+	protected void setFlag(int spot, int flagNumber, char i) {
 		char tmp1 = board[spot].charAt(0);
 		char tmp2 = board[spot].charAt(1);
 		char tmp3 = board[spot].charAt(2);
@@ -173,7 +173,7 @@ public class GameBoard implements Serializable {
 	 * @param i - what to compare the flag to
 	 * @return true - if flag == i otherwise false
 	 */
-	private boolean checkFlag(int spot, int flagNumber, char i)
+	protected boolean checkFlag(int spot, int flagNumber, char i)
 	{
 		return (board[spot].charAt(flagNumber - 1) == i);
 	}
