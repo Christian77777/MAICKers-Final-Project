@@ -36,6 +36,22 @@ public class GameEngine {
 	 * Stores all Game Data for Serialization
 	 */
 	private GameBoard game;
+	
+	/**
+	 * Allows us to set the player's life total and ammo. 
+	 */
+	private Player player;
+	
+	/**
+	 * Keeps track of turn count (invincibility lasts five turns)
+	 */
+	private int turnCount;
+	
+	/**
+	 * If a player is invincible they can't be stabbed by ninjas. 
+	 */
+	private boolean invincibility;
+	
 	/**
 	 * Tells if a Winner has been Decided {@link #victory} Decides who won
 	 */
@@ -57,7 +73,7 @@ public class GameEngine {
 	/**
 	 * Initializes Private Variables to default values
 	 */
-	private Random rand = new Random;
+	private Random rand = new Random();
 	
 	public GameEngine() {
 
@@ -68,7 +84,8 @@ public class GameEngine {
 	 */
 	public void newGame() {
 		int mainMenuOption = ui.welcomeMessage();
-		// TODO
+		// TODO depending on the main menu options, either start new game
+		//or load game, or go to help menu, or ????
 	}
 
 	/**
@@ -86,12 +103,13 @@ public class GameEngine {
 	 */
 	public void runGame() {
 		do {
-
+			executePlayerTurn();
+			executeEnemyTurn();
 		} while (!gameOver);
 		if (victory) {
-			// win
+			ui.printGameOver(true);
 		} else {
-			// lose
+			ui.printGameOver(false);
 		}
 	}
 
@@ -111,6 +129,7 @@ public class GameEngine {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		runGame();
 	}
 
 	/**
@@ -168,7 +187,7 @@ public class GameEngine {
 	 *            to look in
 	 */
 	public void lookInDirection(char direction) {
-
+		//Don't think we need this method anymore
 	}
 
 	/**
@@ -182,15 +201,7 @@ public class GameEngine {
 	 */
 	public boolean shootInDirection(char direction) {
 		boolean hit = false;
-		//TODO
-		if (!ammo) {
-			//would be helpful to check if they have ammo before giving them the option
-			//to shoot
-			ui.printOutOfAmmo();
-			//something to make sure the user's new input is executed
-			return false;
-		}
-		//something to remove ammo
+		player.setAmmo(false);
 		for (int i=0; i<81; i++) {
 			if (game.checkFlag(i, 1, '1')) {
 				switch (direction) {
@@ -257,10 +268,26 @@ public class GameEngine {
 	 * @param type
 	 *            Type of Effect to apply
 	 */
-	public void giveEffect(ItemType type) {
-		if (type == ItemType.BRIEFCASE)// Possibly group Win Condition here
+	public void giveEffect() {
+		int itemLoc=0;
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 1, '1')) {
+				itemLoc= i;
+				break;
+			}
+		}
+		if (game.checkFlag(itemLoc, 2, 'b')) {
+			victory = true;
+		}
+		else if (game.checkFlag(itemLoc, 2, 'a')) {
+			player.setAmmo(true);
+		}
+		else if (game.checkFlag(itemLoc, 2, 'i')) {
+			invincibility = true;
+		}
+		else if (game.checkFlag(itemLoc, 2, 'r'))
 		{
-
+			//Print map with briefcase location shown.
 		}
 	}
 
@@ -270,9 +297,24 @@ public class GameEngine {
 	 */
 	public void executeEnemyTurn() {
 		boolean stab = attemptNinjaStab();
-		//need something to tell the player they were stabbed,
-		//move them back to start space, and 
-		//decrease their life total. (check if even still alive)
+		if (invincibility && turnCount<5) {
+			turnCount++;
+			stab = false;
+		}
+		if(stab) {
+			ui.printDamaged();
+			player.loseLife();
+			for (int i=0; i<81; i++) {
+				if (game.checkFlag(i, 1, '1')) {
+					game.setFlag(i, 1, '0');
+					break;
+				}
+			}
+			game.setFlag(72, 1, '1');
+		}
+		if (player.getLife()<=0) {
+			gameOver=true;
+		}
 		if (hardmode)
 			randomEnemyMove();
 		else
@@ -285,28 +327,49 @@ public class GameEngine {
 	public void executePlayerTurn() {
 		ui.printMap(game.getMap(), /* TODO if value = a, did not look */'f', debug);
 		int choice;
-		while ((choice = ui.pickTurn(true, game.getPlayer().hasAmmo())) == -1) {
+		while ((choice = ui.pickTurn(true, player.hasAmmo())) == -1) {
 			debug = !debug;
 			// reprint Map
 		}
+		//Look Around
 		if (choice == 1) {
 			// TODO Look around, and Reprint Map
 			ui.printMap(game.getMap(), ui.queryLookingDirection(), debug);
-			choice = ui.pickTurn(false, game.getPlayer().hasAmmo());
+			choice = ui.pickTurn(false, player.hasAmmo());
 		}
-		if (choice == 2)// Moving around
-		{
+		//Move Around
+		if (choice == 2){
 			playerMove();
+			boolean item = checkForItems();
+			if (item)
+				giveEffect();
 			// If Player lands on Item, activate Item
 		}
-		if (choice == 3)// Shooting around
-		{
-
-		} else // Save, No loading allowed unless Main Menu
-		{
-
+		//Shoot (Already Checks if Player Has Ammo)
+		if (choice == 3){
+			boolean hit = shootInDirection(ui.queryShootingDirection());
+			//I think this UI method should be changed to take in a boolean.
+			//if boolean is true, print congratulations you've killed an enmy
+			//if boolean is false, print you missed
+			ui.printShotResult(hit);
+		} 
+		//Save, No Loading allowed unless in Main Menu
+		else {
+			saveGame(ui.querySaveFileName());
+			//System.exit(0); ???????????????
 		}
 
+	}
+
+	private boolean checkForItems() {
+		boolean item = false;
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 1, '1')) {
+				if(!game.checkFlag(i, 2, '0'))
+					item = true;
+			}
+		}
+		return item;
 	}
 
 	/**
@@ -373,7 +436,7 @@ public class GameEngine {
 			//to follow the player, they would instead move randomly
 			if (game.checkFlag(i, 3, '1')) {
 				for (int j=i-9; j>0; j-=9) {
-					if (game.checkFlag(j, 1, '1') && !game.isRoom(i=9)) {
+					if (game.checkFlag(j, 1, '1') && !game.isRoom(i-9)) {
 						game.setFlag(i, 3, '0');
 						game.setFlag(i-9, 3, '1');
 						enemyMoved=true;
@@ -407,12 +470,48 @@ public class GameEngine {
 					}
 				}
 				if(!enemyMoved) {
-					//this would move all the enemies randomly. need to just move one
-					randomEnemyMove();
+					singleRandomEnemyMove(i);
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Moves only one ninja randomly. Used for the AI when the ninja can't see 
+	 * the player
+	 */
+	public void singleRandomEnemyMove(int location) {
+		int ninjaLoc = location;
+		int newNinjaLoc = 0;
+		boolean validMove;
+		do {
+			int direction = rand.nextInt(4);
+			switch (direction) {
+			case 0:
+				newNinjaLoc=ninjaLoc-9;
+				break;
+			case 1:
+				newNinjaLoc=ninjaLoc+9;
+				break;
+			case 2:
+				newNinjaLoc=ninjaLoc+1;
+				break;
+			case 3: 
+				newNinjaLoc=ninjaLoc-1;
+				break;
+			}
+			if (newNinjaLoc<0 || newNinjaLoc>0 || game.isRoom(newNinjaLoc))
+				validMove = false;
+			else if (game.checkFlag(newNinjaLoc, 3, '1'))
+				validMove = false;
+			else {
+				validMove = true;
+				game.setFlag(ninjaLoc, 3, '0');
+				game.setFlag(newNinjaLoc, 3, '1');
+			}
+		} while (!validMove);
+	}
+	
 
 	/**
 	 * Prompts Player for Requested Move, and if allowable, move the Player

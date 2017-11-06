@@ -73,7 +73,7 @@ public class Player extends Entities {
 	 * 
 	 * @return the new Life Value
 	 */
-	private int loseLife() {
+	public int loseLife() {
 		life--;
 		return life;
 	}
@@ -81,7 +81,7 @@ public class Player extends Entities {
 	/**
 	 * @return the Life the player has
 	 */
-	private int getLife() {
+	public int getLife() {
 		return life;
 	}
 
