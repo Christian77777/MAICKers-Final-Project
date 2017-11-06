@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import edu.cpp.cs.cs141.final_prog_assgment.Items.ItemType;
+import java.util.Random;
 
 /**
  * This Class Handles all Logic of the Game. And Executes the game actions.
@@ -56,6 +57,8 @@ public class GameEngine {
 	/**
 	 * Initializes Private Variables to default values
 	 */
+	private Random rand = new Random;
+	
 	public GameEngine() {
 
 	}
@@ -142,20 +145,20 @@ public class GameEngine {
 	 * @return if ninjas stabbed player
 	 */
 	public boolean attemptNinjaStab() {
-		//possible way to see if a ninja stabs a player
-		//it would require making a player object and an array of ninja objects of course
-		//wanted to see if this was okay or if there's a better way to do it
-		int playerX = player.getX();
-		int playerY = player.getY();
-		for (Ninja n : ninja) {
-			ninjaX = n.getX();
-			ninjaY = n.getY();
-			if (ninjaX==playerX && (ninjaY-playerY==-1 || ninjaY-playerY==1))
-				return true;
-			else if(ninjaY==playerY && (ninjaX-plyerX==-1 || ninjaY-playerY==1))
-				return true;
+		boolean stab = false;
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 3, '1')) {
+				if (game.checkFlag(i-1, 1, '1'))
+					stab = true;
+				else if (game.checkFlag(i+1, 1, '1'))
+					stab = true;
+				else if (game.checkFlag(i-9, 1, '1'))
+					stab = true;
+				else if (game.checkFlag(i+9, 1, '1'))
+					stab = true;
+			}
 		}
-		return false;
+		return stab;
 	}
 
 	/**
@@ -178,7 +181,54 @@ public class GameEngine {
 	 * @return if a single ninja was removed from game
 	 */
 	public boolean shootInDirection(char direction) {
-		return false;
+		boolean hit = false;
+		//TODO
+		if (!ammo) {
+			//would be helpful to check if they have ammo before giving them the option
+			//to shoot
+			ui.printOutOfAmmo();
+			//something to make sure the user's new input is executed
+			return false;
+		}
+		//something to remove ammo
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 1, '1')) {
+				switch (direction) {
+				case 'n':
+					for (int j=i-9; j>0; j-=9) {
+						if (game.checkFlag(j, 3, '1')) {
+							hit = true;
+							game.setFlag(j, 3, '0');
+							break;
+						}
+					}
+				case 's':
+					for (int j=i+9; j<81; j+=9)
+						if (game.checkFlag(j, 3, '1')) {
+							hit = true;
+							game.setFlag(j, 3, '0');
+							break;
+						}
+				case 'e':
+					for (int j=i+1; (j%9)!=0; j++) {
+						if (game.checkFlag(j, 3, '1')) {
+							hit = true;
+							game.setFlag(j, 3, '0');
+							break;
+						}
+					}
+				case 'w':
+					for (int j=i-1; (j+1)%9!=0; j--) {
+						if (game.checkFlag(j, 3, '1')) {
+							hit = true;
+							game.setFlag(j, 3, '0');
+							break;
+						}
+					}
+				}
+			}
+		}
+		return hit;
 	}
 
 	/**
@@ -219,7 +269,14 @@ public class GameEngine {
 	 * Ninjas to a new Possible Location Then increment turnCount {@link #game}
 	 */
 	public void executeEnemyTurn() {
-
+		boolean stab = attemptNinjaStab();
+		//need something to tell the player they were stabbed,
+		//move them back to start space, and 
+		//decrease their life total. (check if even still alive)
+		if (hardmode)
+			randomEnemyMove();
+		else
+			smartEnemyMove();
 	}
 
 	/**
@@ -253,11 +310,107 @@ public class GameEngine {
 	}
 
 	/**
-	 * For Each Enemy, random move, or calculated move (depending on hardmode).
+	 * For Each Enemy, random move.
 	 */
-	public void enemyMove() {
-		if (hardmode) {
-
+	public void randomEnemyMove() {
+		int numberOfNinjas=0;
+		for (int i=0; i<81; i++) {
+			if(game.checkFlag(i, 3, '1'))
+				numberOfNinjas++;
+		}
+		int[] ninjaLoc = new int[numberOfNinjas];
+		int[] newNinjaLoc = new int[numberOfNinjas];
+		int j = 0;
+		boolean validMove;
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 3, '1')) {
+				ninjaLoc[j]=i;
+				j++;
+			}
+		}
+		for (int i=0; i<ninjaLoc.length; i++) {
+			do {
+				validMove = true;
+				int moveDirection = rand.nextInt(4);
+				switch (moveDirection) {
+				case 0:
+					newNinjaLoc[i] = ninjaLoc[i]-9;
+					break;
+				case 1:
+					newNinjaLoc[i] = ninjaLoc[i]+9;
+					break;
+				case 2:
+					newNinjaLoc[i] = ninjaLoc[i]+1;
+					break;
+				case 3:
+					newNinjaLoc[i] = ninjaLoc[i]-1;
+					break;
+				}
+				if(newNinjaLoc[i]<0 || newNinjaLoc[i]>81 || game.isRoom(newNinjaLoc[i]))
+					validMove = false;
+				else if (true) {
+					for (int n=i-1; n>=0; n--) {
+						if (newNinjaLoc[i]==newNinjaLoc[n])
+							validMove=false;
+					}
+				}
+			}while(!validMove);
+		}
+		for (int i=0; i<ninjaLoc.length; i++) {
+			game.setFlag(ninjaLoc[i], 3, '0');
+			game.setFlag(newNinjaLoc[i], 3, '1');
+		}
+	}
+	
+	/**
+	 * Moves the ninja towards the player if the player happens to be in the same
+	 * row or column as them. 
+	 */
+	public void smartEnemyMove() {
+		for (int i=0; i<81; i++) {
+			boolean enemyMoved=false;
+			//currently have it so that if ninja's would be stepping into a room
+			//to follow the player, they would instead move randomly
+			if (game.checkFlag(i, 3, '1')) {
+				for (int j=i-9; j>0; j-=9) {
+					if (game.checkFlag(j, 1, '1') && !game.isRoom(i=9)) {
+						game.setFlag(i, 3, '0');
+						game.setFlag(i-9, 3, '1');
+						enemyMoved=true;
+					}
+				}
+				if (!enemyMoved) {
+					for (int j=i+9; j<81; j+=9) {
+						if (game.checkFlag(j, 1, '1') && !game.isRoom(i+9)) {
+							game.setFlag(i, 3, '0');
+							game.setFlag(i+9, 3, '1');
+							enemyMoved = true;
+						}
+					}
+				}
+				if (!enemyMoved) {
+					for (int j=i+1; (j%9)!=0; j++) {
+						if (game.checkFlag(j, 1, '1') && !game.isRoom(i+1)) {
+							game.setFlag(i, 3, '0');
+							game.setFlag(i+1, 3, '1');
+							enemyMoved = true;
+						}
+					}
+				}
+				if (!enemyMoved) {
+					for (int j=i-1; (j+1)%9!=0; j--) {
+						if (game.checkFlag(j, 1, '1') && !game.isRoom(i-1)) {
+							game.setFlag(i, 3, '0');
+							game.setFlag(i, 3, '1');
+							enemyMoved = true;
+						}
+					}
+				}
+				if(!enemyMoved) {
+					//this would move all the enemies randomly. need to just move one
+					randomEnemyMove();
+				}
+			}
 		}
 	}
 
@@ -265,40 +418,37 @@ public class GameEngine {
 	 * Prompts Player for Requested Move, and if allowable, move the Player
 	 */
 	public void playerMove() {
-		int a;
-		int b;
-		boolean enterable;
-		char choice;
-		do {
-			enterable = false;
-			choice = ui.queryMovingDirection();
-			a = game.getPlayer().newX(choice);
-			b = game.getPlayer().newY(choice);
-			if (game.getPlayer().isSpecialRoom(a, b)) {
-				if (choice == 's') {
-					enterable = true;
-				}
-			} else {
-				enterable = true;
+		char direction;
+		boolean validMove=false;
+		int playerLoc=0;
+		for (int i=0; i<81; i++) {
+			if (game.checkFlag(i, 1, '1')) {
+				playerLoc = i;
+				break;
 			}
-		} while (game.getPlayer().isStillInBounds(a, b) && enterable);
-		game.getPlayer().move(choice);
-	}
-
-	public boolean isSpecialRoom(int a, int b) {
-		boolean room1 = a == 1 && b == 1;
-		boolean room2 = a == 4 && b == 1;
-		boolean room3 = a == 7 && b == 1;
-		boolean room4 = a == 1 && b == 4;
-		boolean room5 = a == 4 && b == 4;
-		boolean room6 = a == 1 && b == 4;
-		boolean room7 = a == 7 && b == 7;
-		boolean room8 = a == 4 && b == 7;
-		boolean room9 = a == 7 && b == 7;
-		if (room1 || room2 || room3 || room4 || room5 || room6 || room7 || room8 || room9) {
-			return true;
-		} else {
-			return false;
 		}
+		do{
+			direction = ui.queryMovingDirection();
+			int newPlayerLoc;
+			switch (direction){
+			case 'n':
+				newPlayerLoc = playerLoc-9;	
+			case 's':
+				newPlayerLoc = playerLoc+9;
+			case 'e':
+				newPlayerLoc = playerLoc+1;
+			case 'w':
+				newPlayerLoc = playerLoc-1;
+			}
+			if (newPlayerLoc<0 || newPlayerLoc>81)
+				ui.printInvalidMove();
+			else if (game.isRoom(newPlayerLoc) && direction!='s')
+				ui.printInvalidMove();
+			else {
+				validMove = true;
+				game.setFlag(playerLoc, 1, '0');
+				game.setFlag(newPlayerLoc, 1, '1');
+			}
+		}while (!validMove);
 	}
 }
