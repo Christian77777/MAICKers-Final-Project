@@ -210,6 +210,7 @@ public class GameBoard implements Serializable {
 	
 	/**
 	 * Loops through board array and checks for player position
+	 * shouldn't ever return -1.
 	 * @return int of player's location
 	 */
 	protected int getPlayerLoc() {
@@ -217,6 +218,8 @@ public class GameBoard implements Serializable {
 			if (checkFlag(i, 1, '1')) {
 				return i;
 			}
+		}
+		return -1;
 	}
 		
 }
