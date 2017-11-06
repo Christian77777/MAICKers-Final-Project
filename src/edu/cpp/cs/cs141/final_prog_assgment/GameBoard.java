@@ -204,7 +204,19 @@ public class GameBoard implements Serializable {
 	 * 
 	 * @return the array of strings that hold the data for the map
 	 */
-	public String[] getMapData() {
+	protected String[] getMapData() {
 		return board;
 	}
+	
+	/**
+	 * Loops through board array and checks for player position
+	 * @return int of player's location
+	 */
+	protected int getPlayerLoc() {
+		for (int i=0; i < 81; i++) {
+			if (checkFlag(i, 1, '1')) {
+				return i;
+			}
+	}
+		
 }
