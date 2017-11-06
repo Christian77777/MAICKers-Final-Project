@@ -15,6 +15,8 @@
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 /**
@@ -92,38 +94,181 @@ public class UserInterface {
 	 * @return the file name
 	 */
 	public String queryLoadFileName() {
-		return null;
+		System.out.println("What would you like to name your Save file to?");
+		String result = scanner.nextLine();
+		boolean namePermissible;
+		try {
+			Paths.get("dir", result, ".ser");//TODO verify this works
+			namePermissible = true;
+		}
+		catch(InvalidPathException p)
+		{
+			namePermissible = false;
+		}
+		while (namePermissible){
+			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
+			result = scanner.nextLine();
+			try {
+				Paths.get("dir", result, ".ser");//TODO verify this works
+				namePermissible = true;
+			}
+			catch(InvalidPathException p)
+			{
+				namePermissible = false;
+			}
+		}
+		System.out.println();
+		return result;
 	}
 
 	/**
 	 * Print warning message that the player lost a life, and returned to 0,0
 	 */
 	public void printDamaged() {
-
+		System.out.println("A Ninja got you! You are forced to retreat to the Starting Point");
 	}
 
 	/**
-	 * Print a query for the Difficulty to play the game at
+	 * Print a query for the Difficulty to play the game at In Reality, define if
+	 * the AI should be enabled
 	 * 
-	 * @return the selected difficulty
+	 * @return the selected difficulty, where true means enable AI
 	 */
 	public boolean offerDifficulty() {
-		return false;
+		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
+		String result = scanner.nextLine();
+		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
+			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
+			result = scanner.nextLine();
+		}
+		System.out.println();
+		return result.equalsIgnoreCase("Y");
 	}
 
-	public char queryMovingDirection() {
-		return 'm';
+	/**
+	 * Gets a Direction from the UI
+	 * 
+	 * @param actionType
+	 *            What is the Direction entered in reference to
+	 * @return The Direction the user specified, as a char of either n,s,w,e
+	 */
+	public char queryDirection(String actionType) {
+		System.out.print("Which direction would you like to " + actionType + " in? (N/S/E/W)\nDirection: ");
+		String result = scanner.nextLine();
+		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("S")
+				|| result.equalsIgnoreCase("W") || result.equalsIgnoreCase("E"))) {
+			System.out.print("\nThats not a Cardinal direction! Please enter again either (N/S/W/W)\nDirection:");
+			result = scanner.nextLine();
+		}
+		System.out.println();
+		return result.toLowerCase().charAt(0);
 	}
 
-	public char queryLookingDirection() {
-		return 'a';
+	/**
+	 * Prints out to the Console the Map as well as the Legend If the User looked in
+	 * a direction,
+	 * 
+	 * @param map
+	 *            the locations of all the entities
+	 * @param lookDirection
+	 *            'f' if no looking done. n/s/e/w otherwise to represent the 4
+	 *            directions
+	 * @param debug
+	 *            if Everything should just be revealed
+	 * @param radarActive
+	 *            if the suitcase should be shown
+	 */
+	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
+		char[][] board = formatMap(map, lookDirection, debug, radarActive);
+		String console = "";
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				console += "[" + board[x][y] + "]";
+			}
+			console += "\n";
+		}
+		console += "\n\nLegend:\n\tP = player\n\tN = ninja\n\tA= bullet\n\tI = invincibility\n\tR = radar\n\tB = briefcase!\n";
+		System.out.println(console);
 	}
 
-	public char queryShootingDirection() {
-		return 'o';
-	}
-
-	public void printMap(Entities[][] map, char lookDirection, boolean debug) {
-		System.out.println(map[0][0]);
+	/**
+	 * Formats the Game Board to show a single entity, and if that entity should be
+	 * shown based on the parameters
+	 * 
+	 * @param map
+	 *            the locations of all the entities
+	 * @param lookDirection
+	 *            'f' if no looking done. n/s/e/w otherwise to represent the 4
+	 *            directions
+	 * @param debug
+	 *            if Everything should just be revealed
+	 * @param radarActive
+	 *            if the suitcase should be shown
+	 * @return a Matrix with each slot representing a character that should be shown
+	 *         by the UI
+	 */
+	private char[][] formatMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
+		// current coordinates
+		int x = 0;
+		int y = 0;
+		// Player coordinates
+		int i = 0;
+		int j = 0;
+		char[][] slots = new char[9][9];
+		char[][] board = new char[9][9];
+		for (int z = 0; z < 81; z++) {
+			if (x < 9) {
+				x++;
+			} else {
+				y++;
+				x = 0;
+			}
+			if (!(map[z].charAt(1) == ('0'))) {
+				slots[x][y] = map[z].charAt(2);
+			}
+			if (map[z].charAt(0) == ('1')) {
+				slots[x][y] = 'p';
+				i = x;
+				j = y;
+			}
+			if (map[z].charAt(2) == ('1')) {
+				slots[x][y] = 'n';
+			}
+		}
+		for (int a = 0; a < 9; a++) {
+			for (int b = 0; b < 9; b++) {
+				if (lookDirection == 'f') {
+					if (slots[a][b] != 'p') {
+						board[a][b] = 'X';
+					} else {
+						board[a][b] = 'p';
+					}
+				} else {
+					boolean viewedSlots = false;
+					if (lookDirection == 'n') {
+						viewedSlots = (a == i && (b > j && b < j + 3));
+					} else if (lookDirection == 's') {
+						viewedSlots = (a == i && (b < j && b > j - 3));
+					} else if (lookDirection == 'w') {
+						viewedSlots = ((a < i && a > i - 3) && b == j);
+					} else if (lookDirection == 'e') {
+						viewedSlots = ((a > i && a < i + 3) && b == j);
+					}
+					if (slots[a][b] == 'p') {
+						board[a][b] = 'p';
+					} else if (slots[a][b] == 'n' && (viewedSlots || debug)) {
+						board[a][b] = 'n';
+					} else if ((slots[a][b] == 'a' || slots[a][b] == 'i' || slots[a][b] == 'r')
+							&& (viewedSlots || debug)) {
+						board[a][b] = slots[a][b];
+					} else if (slots[a][b] == 'b' && (debug || (viewedSlots && (j + 1 == b && i == a)))) {
+						board[a][b] = 'b';
+					} else {
+						board[a][b] = 'X';
+					}
+				}
+			}
+		}
+		return board;
 	}
 }
