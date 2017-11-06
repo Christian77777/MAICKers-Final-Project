@@ -199,4 +199,12 @@ public class GameBoard implements Serializable {
 		}else
 			return false;
 	}
+	
+	/**
+	 * 
+	 * @return the array of strings that hold the data for the map
+	 */
+	public String[] getMapData() {
+		return board;
+	}
 }

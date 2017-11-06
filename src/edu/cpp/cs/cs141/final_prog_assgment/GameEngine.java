@@ -53,6 +53,11 @@ public class GameEngine {
 	private boolean invincibility;
 	
 	/**
+	 * If true, the user can see the location of the briefcase.
+	 */
+	private boolean radar;
+	
+	/**
 	 * Tells if a Winner has been Decided {@link #victory} Decides who won
 	 */
 	private boolean gameOver;
@@ -74,6 +79,8 @@ public class GameEngine {
 	 * Initializes Private Variables to default values
 	 */
 	private Random rand = new Random();
+	
+	private String[] board;
 	
 	public GameEngine() {
 
@@ -287,7 +294,7 @@ public class GameEngine {
 		}
 		else if (game.checkFlag(itemLoc, 2, 'r'))
 		{
-			//Print map with briefcase location shown.
+			radar = true;
 		}
 	}
 
@@ -325,7 +332,7 @@ public class GameEngine {
 	 * 1. Display Turn Options 2. return Result 3. Execute Action
 	 */
 	public void executePlayerTurn() {
-		ui.printMap(game.getMap(), /* TODO if value = a, did not look */'f', debug);
+		ui.printMap(board, 'f', debug, radar);
 		int choice;
 		while ((choice = ui.pickTurn(true, player.hasAmmo())) == -1) {
 			debug = !debug;
@@ -334,7 +341,7 @@ public class GameEngine {
 		//Look Around
 		if (choice == 1) {
 			// TODO Look around, and Reprint Map
-			ui.printMap(game.getMap(), ui.queryLookingDirection(), debug);
+			ui.printMap(board, ui.queryLookingDirection(), debug, radar);
 			choice = ui.pickTurn(false, player.hasAmmo());
 		}
 		//Move Around
@@ -549,5 +556,12 @@ public class GameEngine {
 				game.setFlag(newPlayerLoc, 1, '1');
 			}
 		}while (!validMove);
+	}
+	
+	/**
+	 * 
+	 */
+	public void getMapData() {
+		board = game.getMapData();
 	}
 }
