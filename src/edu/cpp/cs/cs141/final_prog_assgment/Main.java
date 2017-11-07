@@ -72,7 +72,8 @@ public class Main {
 		ui.printMap(b.getMapData(), 'f', false, false);
 		ui.printMap(b.getMapData(), 'f', true, false);
 		ui.printMap(b.getMapData(), 'f', false, true);
-		ui.printMap(b.getMapData(), 'f', true, true);
+		ui.printMap(b.getMapData(), 'n', false, false);
+		ui.printMap(b.getMapData(), 'e', false, false);
 		
 	}
 
