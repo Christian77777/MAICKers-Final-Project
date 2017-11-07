@@ -34,7 +34,7 @@ public class Main {
 		//Testing below//
 		GameBoard b = new GameBoard();
 		//b.qPrint();
-		b.displayData(false);
+	//	b.displayData(false);
 		
 		
 //		System.out.println(b.checkFlag(72, 1, '1'));
@@ -67,6 +67,12 @@ public class Main {
 //		System.out.println(b.isRoom(80));
 //		System.out.println(b.isRoom(78));
 //		System.out.println(b.isRoom(77));
+		
+		UserInterface ui = new UserInterface();
+		ui.printMap(b.getMapData(), 'f', false, false);
+		ui.printMap(b.getMapData(), 'f', true, false);
+		ui.printMap(b.getMapData(), 'f', false, true);
+		ui.printMap(b.getMapData(), 'f', true, true);
 		
 	}
 
