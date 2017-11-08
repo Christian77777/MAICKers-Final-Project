@@ -29,7 +29,14 @@ public class UserInterface
 	 * This Scanner scans the Console for Input from the User
 	 */
 	private Scanner scanner;
+	/**
+	 * Coordinates that define a Special room, for both x and y axis
+	 */
+	private static int[] specialCoords = { 1, 4, 7 };
 
+	/**
+	 * Creates Scanner from Console Input
+	 */
 	public UserInterface()
 	{
 		scanner = new Scanner(System.in);
@@ -108,7 +115,7 @@ public class UserInterface
 		boolean namePermissible;
 		try
 		{
-			Paths.get("dir", result, ".ser");// TODO verify this works
+			Paths.get("dir", result, ".ser");// TODO verify that entered Strings are acceptable in File Name
 			namePermissible = true;
 		}
 		catch (InvalidPathException p)
@@ -121,7 +128,7 @@ public class UserInterface
 			result = scanner.nextLine();
 			try
 			{
-				Paths.get("dir", result, ".ser");// TODO verify this works
+				Paths.get("dir", result, ".ser");// TODO verify that entered Strings are acceptable in File Name
 				namePermissible = true;
 			}
 			catch (InvalidPathException p)
@@ -207,7 +214,7 @@ public class UserInterface
 			}
 			console += "\n";
 		}
-		//console += "\n\nLegend:\n\tP = player\n\tN = ninja\n\tA= bullet\n\tI = invincibility\n\tR = radar\n\tB = briefcase!\n";
+		// console += "\nLegend:\n\tP = player\n\tN = ninja\n\tA = bullet\n\tI = invincibility\n\tR = radar\n\tB = briefcase!\n";
 		System.out.println(console);
 	}
 
@@ -268,6 +275,8 @@ public class UserInterface
 			for (int b = 0; b < 9; b++)
 			{
 				boolean viewedSlots = false;
+				// most indices regarding slots in the matrixes need to be
+				// [y][x] instead of [x][y]
 				switch (lookDirection)
 				{
 				case 'n':
@@ -282,18 +291,6 @@ public class UserInterface
 				case 'e':
 					viewedSlots = ((b > i && b < i + 3) && a == j);
 					break;
-				/*case 'n':
-					viewedSlots = (a == i && (b < j && b > j - 3));
-					break;
-				case 's':
-					viewedSlots = (a == i && (b > j && b < j + 3));
-					break;
-				case 'w':
-					viewedSlots = ((a < i && a > i - 3) && b == j);
-					break;
-				case 'e':
-					viewedSlots = ((a > i && a < i + 3) && b == j);
-					break;*/
 				case 'f':
 					viewedSlots = false;
 					break;
@@ -302,23 +299,39 @@ public class UserInterface
 				}
 				if (slots[a][b] == 'p')
 				{
-					board[a][b] = 'p';
+					board[a][b] = 'P';
 				}
 				else if (slots[a][b] == 'n' && (viewedSlots || debug))
 				{
-					board[a][b] = 'n';
+					board[a][b] = 'N';
 				}
 				else if ((slots[a][b] == 'a' || slots[a][b] == 'i' || slots[a][b] == 'r') && (viewedSlots || debug))
 				{
-					board[a][b] = slots[a][b];
+					board[a][b] = Character.toUpperCase(slots[a][b]);
 				}
-				else if (slots[a][b] == 'b' && (debug || radarActive || (viewedSlots && ((j - 1) == b && i == a))))
+				else if (slots[a][b] == 'b' && (debug || radarActive || (viewedSlots && ((j - 1) == b && i == a))))// Only
+																													// Show
+																													// Briefcase
+																													// if
+																													// Player
+																													// is
+																													// just
+																													// above
+																													// room
+																													// and
+																													// looks
+																													// South
 				{
-					board[a][b] = 'b';
+					board[a][b] = 'B';
+				}
+				else if((specialCoords[0] == a || specialCoords[1] == a || specialCoords[2] == a)
+							&& (specialCoords[0] == b || specialCoords[1] == b || specialCoords[2] == b) && board[a][b] != 'B')
+				{
+					board[a][b] = 'r';
 				}
 				else if (!debug && !viewedSlots)
 				{
-					board[a][b] = 'X';
+					board[a][b] = '*';
 				}
 
 			}
