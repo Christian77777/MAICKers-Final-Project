@@ -221,5 +221,4 @@ public class GameBoard implements Serializable {
 		}
 		return -1;
 	}
-		
 }
