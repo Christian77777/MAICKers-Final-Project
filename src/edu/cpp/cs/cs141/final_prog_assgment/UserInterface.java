@@ -15,6 +15,7 @@
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
+import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class UserInterface {
 	}
 
 	/**
-	 * Print if the player shot a ninja DEAD
+	 * Print if the player shot a Ninja DEAD
 	 */
 	public void printShotResult(boolean result) {
 		double dice = Math.random();
@@ -155,7 +156,20 @@ public class UserInterface {
 	 * @return the name user Request to Save the file As
 	 */
 	public String querySaveFileName() {
-		return null;
+		System.out.println("What would you like to name your Save file to?\nName: ");
+		do {
+			String result = scanner.nextLine();
+			try {
+				// TODO verify that entered Strings are acceptable in File Name (does this actually work?)
+				//sysout only to see the result, not to be reprinted
+				//must pass in save directory
+				System.out.println(Paths.get("dir" + File.separator + result + ".ser"));
+				return result;
+			} catch (InvalidPathException p) {
+
+				System.out.print("\nThats not a Valid file Name! Please remove invalid characters\nName:");
+			}
+		} while (true);
 	}
 
 	public void printInvalidMove() {
@@ -169,27 +183,7 @@ public class UserInterface {
 	 * @return the file name
 	 */
 	public String queryLoadFileName() {
-		System.out.println("What would you like to name your Save file to?");
-		String result = scanner.nextLine();
-		boolean namePermissible;
-		try {
-			Paths.get("dir", result, ".ser");// TODO verify that entered Strings are acceptable in File Name
-			namePermissible = true;
-		} catch (InvalidPathException p) {
-			namePermissible = false;
-		}
-		while (namePermissible) {
-			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
-			result = scanner.nextLine();
-			try {
-				Paths.get("dir", result, ".ser");// TODO verify that entered Strings are acceptable in File Name
-				namePermissible = true;
-			} catch (InvalidPathException p) {
-				namePermissible = false;
-			}
-		}
-		System.out.println();
-		return result;
+		return null;
 	}
 
 	/**
