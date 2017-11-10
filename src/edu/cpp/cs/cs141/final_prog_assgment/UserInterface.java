@@ -327,11 +327,11 @@ public class UserInterface
 				else if((specialCoords[0] == a || specialCoords[1] == a || specialCoords[2] == a)
 							&& (specialCoords[0] == b || specialCoords[1] == b || specialCoords[2] == b) && board[a][b] != 'B')
 				{
-					board[a][b] = 'r';
+					board[a][b] = '#';
 				}
 				else if (!debug && !viewedSlots)
 				{
-					board[a][b] = '*';
+					board[a][b] = '\u2022';
 				}
 
 			}

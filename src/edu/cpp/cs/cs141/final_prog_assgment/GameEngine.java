@@ -341,7 +341,7 @@ public class GameEngine {
 		//Look Around
 		if (choice == 1) {
 			// TODO Look around, and Reprint Map
-			ui.printMap(board, ui.queryDirection("look"), debug, radar);
+			ui.printMap(board, ui.queryDirection("Look"), debug, radar);
 			choice = ui.pickTurn(false, player.hasAmmo());
 		}
 		//Move Around
@@ -354,7 +354,7 @@ public class GameEngine {
 		}
 		//Shoot (Already Checks if Player Has Ammo)
 		if (choice == 3){
-			boolean hit = shootInDirection(ui.queryDirection("move"));
+			boolean hit = shootInDirection(ui.queryDirection("Shoot"));
 			//I think this UI method should be changed to take in a boolean.
 			//if boolean is true, print congratulations you've killed an enmy
 			//if boolean is false, print you missed
@@ -538,13 +538,17 @@ public class GameEngine {
 			int newPlayerLoc;
 			switch (direction){
 			case 'n':
-				newPlayerLoc = playerLoc-9;	
+				newPlayerLoc = playerLoc-9;
+				break;
 			case 's':
 				newPlayerLoc = playerLoc+9;
+				break;
 			case 'e':
 				newPlayerLoc = playerLoc+1;
+				break;
 			case 'w':
 				newPlayerLoc = playerLoc-1;
+				break;
 			}
 			if (newPlayerLoc<0 || newPlayerLoc>81)
 				ui.printInvalidMove();
@@ -564,4 +568,5 @@ public class GameEngine {
 	public void getMapData() {
 		board = game.getMapData();
 	}
+	
 }
