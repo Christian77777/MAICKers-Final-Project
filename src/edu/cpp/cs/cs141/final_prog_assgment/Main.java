@@ -32,8 +32,8 @@ public class Main {
 		engine.newGame();
 		*/
 		//Testing below//
-		GameBoard b = new GameBoard();
-		System.out.println(b.getPlayerLoc());
+//		GameBoard b = new GameBoard();
+//		System.out.println(b.getPlayerLoc());
 		//b.qPrint();
 	//	b.displayData(false);
 		
@@ -69,13 +69,15 @@ public class Main {
 //		System.out.println(b.isRoom(78));
 //		System.out.println(b.isRoom(77));
 		
-		UserInterface ui = new UserInterface();
-		ui.printMap(b.getMapData(), 'f', false, false);
-		ui.printMap(b.getMapData(), 'f', true, false);
-		ui.printMap(b.getMapData(), 'f', false, true);
-		ui.printMap(b.getMapData(), 'n', false, false);
-		ui.printMap(b.getMapData(), 'e', false, false);
+//		UserInterface ui = new UserInterface();
+//		ui.printMap(b.getMapData(), 'f', false, false);
+//		ui.printMap(b.getMapData(), 'f', true, false);
+//		ui.printMap(b.getMapData(), 'f', false, true);
+//		ui.printMap(b.getMapData(), 'n', false, false);
+//		ui.printMap(b.getMapData(), 'e', false, false);
 		
+		GameEngine gameEngine = new GameEngine();
+		gameEngine.newGame();
 	}
 
 }
