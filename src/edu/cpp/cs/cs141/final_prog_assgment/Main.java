@@ -78,6 +78,10 @@ public class Main {
 		
 		GameEngine gameEngine = new GameEngine();
 		gameEngine.newGame();
+		
+//		GameBoard gameBoard = new GameBoard();
+//		UserInterface ui = new UserInterface();
+//		ui.printMap(gameBoard.getMapData(), 'f', false, false);
 	}
 
 }

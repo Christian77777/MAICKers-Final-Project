@@ -57,6 +57,8 @@ public class GameEngine {
 	 */
 	private boolean radar;
 	
+	private int playerLoc;
+	
 	/**
 	 * Tells if a Winner has been Decided {@link #victory} Decides who won
 	 */
@@ -84,7 +86,6 @@ public class GameEngine {
 	
 	public GameEngine() {
 		ui = new UserInterface();
-		game = new GameBoard();
 	}
 
 	/**
@@ -107,6 +108,9 @@ public class GameEngine {
 	 * Starts a new Game
 	 */
 	public void startGame() {
+		game = new GameBoard();
+		playerLoc = game.getPlayerLoc();
+		getMapData();
 		hardmode = ui.offerDifficulty();
 		runGame();
 	}
@@ -180,7 +184,6 @@ public class GameEngine {
 	 */
 	public boolean attemptNinjaStab() {
 		boolean stab = false;
-		int playerLoc = game.getPlayerLoc();
 		for (int i=0; i<81; i++) {
 			if (game.checkFlag(i, 3, '1')) {
 				if (i-9==playerLoc)
@@ -219,7 +222,6 @@ public class GameEngine {
 	public boolean shootInDirection(char direction) {
 		boolean hit = false;
 		player.setAmmo(false);
-		int playerLoc = game.getPlayerLoc();
 		switch (direction) {
 		case 'n':
 			for (int i=playerLoc-9; i>0; i-=9) {
@@ -277,22 +279,18 @@ public class GameEngine {
 	 *            Type of Effect to apply
 	 */
 	public void giveEffect() {
-		int playerLoc = game.getPlayerLoc();
-		if (game.checkFlag(playerLoc, 2, 'b')) {
-			victory = true;
-		}
-		else if (game.checkFlag(playerLoc, 2, 'a')) {
+		if (game.checkFlag(playerLoc, 2, 'a')) {
 			player.setAmmo(true);
-//			ui.printPowerUp('a');
+			ui.printPowerUp('a');
 		}
 		else if (game.checkFlag(playerLoc, 2, 'i')) {
 			invincibility = true;
-//			ui.printPowerUp('i');
+			ui.printPowerUp('i');
 		}
 		else if (game.checkFlag(playerLoc, 2, 'r'))
 		{
 			radar = true;
-//			ui.printPowerUp('r');
+			ui.printPowerUp('r');
 		}
 	}
 
@@ -311,13 +309,9 @@ public class GameEngine {
 		if(stab) {
 			ui.printDamaged();
 			player.loseLife();
-			for (int i=0; i<81; i++) {
-				if (game.checkFlag(i, 1, '1')) {
-					game.setFlag(i, 1, '0');
-					break;
-				}
-			}
+			game.setFlag(playerLoc, 1, '0');
 			game.setFlag(72, 1, '1');
+			playerLoc = 72;
 		}
 		if (player.getLife()<=0) {
 			gameOver=true;
@@ -334,8 +328,10 @@ public class GameEngine {
 	public void executePlayerTurn() {
 		ui.printMap(board, 'f', debug, radar);
 		int choice;
-		while ((choice = ui.pickTurn(true, player.hasAmmo())) == -1) {
+		choice=ui.pickTurn(true, player.hasAmmo());
+		while (choice == -1) {
 			debug = !debug;
+			choice = ui.pickTurn(true, player.hasAmmo());
 			// reprint Map
 		}
 		//Look
@@ -369,7 +365,6 @@ public class GameEngine {
 
 	public boolean checkForItems() {
 		boolean item = false;
-		int playerLoc = game.getPlayerLoc();
 		if (!game.checkFlag(playerLoc, 2, '0'))
 			item = true;
 		return item;
@@ -433,7 +428,6 @@ public class GameEngine {
 	 * row or column as them AND they isn't a room in between them.
 	 */
 	public void smartEnemyMove() {
-		int playerLoc = game.getPlayerLoc();
 		for (int i=0; i<81; i++) {
 			boolean enemyMoved=false;
 			if (game.checkFlag(i, 3, '1')) {
@@ -530,7 +524,6 @@ public class GameEngine {
 	public void playerMove() {
 		char direction;
 		boolean validMove=false;
-		int playerLoc = game.getPlayerLoc(); 
 		do{
 			direction = ui.queryDirection("move");
 			int newPlayerLoc=-1;
@@ -552,12 +545,28 @@ public class GameEngine {
 				ui.printInvalidMove();
 			else if (game.isRoom(newPlayerLoc) && direction!='s')
 				ui.printInvalidMove();
+			else if (game.isRoom(newPlayerLoc) && direction == 's') {
+				checkRoom();
+				validMove = true;
+			}
 			else {
 				validMove = true;
 				game.setFlag(playerLoc, 1, '0');
 				game.setFlag(newPlayerLoc, 1, '1');
 			}
 		}while (!validMove);
+		playerLoc = game.getPlayerLoc();
+	}
+	
+	public void checkRoom() {
+		if (game.checkFlag(playerLoc+9, 2, 'b')) {
+			gameOver = true;
+			victory = true;
+			ui.printRoomContents(true);
+		}
+		else {
+			ui.printRoomContents(false);
+		}
 	}
 	
 	/**

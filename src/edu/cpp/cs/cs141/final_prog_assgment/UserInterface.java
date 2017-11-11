@@ -358,4 +358,20 @@ public class UserInterface {
 		}
 		return board;
 	}
+	
+	public void printRoomContents(boolean briefcase) {
+		if (briefcase)
+			System.out.println("The briefcase is in this room!");
+		else
+			System.out.println("This room is empty.");
+	}
+	
+	public void printPowerUp(char item) {
+		if (item == 'a')
+			System.out.println("You've found a bullet! You now have max ammo");
+		else if (item == 'i')
+			System.out.println("You're invincible for 5 turns! Ninjas can't kill you.");
+		else if (item == 'r')
+			System.out.println("You've found a radar! You know where the briefcase is.");
+	}
 }
