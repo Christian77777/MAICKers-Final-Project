@@ -33,6 +33,7 @@ public class Main {
 		*/
 		//Testing below//
 		GameBoard b = new GameBoard();
+		System.out.println(b.getPlayerLoc());
 		//b.qPrint();
 	//	b.displayData(false);
 		

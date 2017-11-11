@@ -184,7 +184,7 @@ public class GameBoard implements Serializable {
 	 * @param i - the spot to check
 	 */
 	private boolean inProxPlayer(int i) {
-		if(i == 72 || i == 73 || i == 74 || i == 63 || i == 54 || i == 64) {
+		if(i == 72 || i == 73 || i == 74 || i == 63 || i == 54 || i == 55 || i == 56 || i == 64 || i == 65) {
 			return true;
 		}else
 			return false;
@@ -221,5 +221,4 @@ public class GameBoard implements Serializable {
 		}
 		return -1;
 	}
-		
 }
