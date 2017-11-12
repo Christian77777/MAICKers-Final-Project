@@ -59,7 +59,7 @@ public class GameBoard implements Serializable {
 	 * 1 - true ninja is there(001)
 	 * 0 - false no ninja there.(000)
 	 */
-	private void placeNinja() {
+	protected void placeNinja() {
 		boolean InvalidSpot = true;
 		Random r = new Random();
 		int num = r.nextInt(81);

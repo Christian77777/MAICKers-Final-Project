@@ -50,6 +50,12 @@ public class UserInterface {
 	 */
 	public int welcomeMessage() {
 		System.out.println("Welcome to the Spy Game!");
+		//TODO
+		//Needs to print out options
+		//1. Start New Game
+		//2. Load Game
+		//3. Help
+		//4. ???
 		int input = 0;
 		try {
 			input = scanner.nextInt();
@@ -81,10 +87,13 @@ public class UserInterface {
 	 * @return a verified integer corresponding to a action
 	 */
 	public int pickTurn(boolean canLook, boolean canShoot) {
+		//TODO
+		//add an option for the user to save the game. 
 		ArrayList<Integer> options = new ArrayList<Integer>();
 		StringBuilder builder = new StringBuilder("What would you like to do?");
 		builder.append("\n1. Move");
 		options.add(1);
+		options.add(-1);///ADDED for debug mode
 		if (canLook) {
 			builder.append("\n2. Look");
 			options.add(2);
@@ -97,7 +106,7 @@ public class UserInterface {
 		} else {
 			builder.append("\n- No Ammo");
 		}
-		builder.append("Option: ");
+		builder.append("\nOption: ");
 		do {
 			System.out.println(builder.toString());
 			try {
@@ -107,6 +116,7 @@ public class UserInterface {
 				}
 				System.out.println("This is not a option");
 			} catch (InputMismatchException i) {
+				//TODO Game infinitely loops if they enter something that isn't a number
 				System.out.println("That is not a even a Number!");
 			}
 		} while (true);
@@ -119,7 +129,11 @@ public class UserInterface {
 	 *            if the Player won, or AI won
 	 */
 	public void printGameOver(boolean victorious) {
-		System.out.println("You Lost all your lives. Game Over");
+		if (victorious) {//I added this in. feel free to change the string it prints
+			System.out.println("Congratulations you won!");
+		}
+		else
+			System.out.println("You Lost all your lives. Game Over");
 	}
 
 	/**
@@ -201,10 +215,11 @@ public class UserInterface {
 	 */
 	public boolean offerDifficulty() {
 		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
-		String result = scanner.nextLine();
+		String result = scanner.next(); //changed from nextLine to next
+		//TODO this statement in the while loop should be checking if it DOESN't equal yes or no
 		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
 			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
-			result = scanner.nextLine();
+			result = scanner.next(); //changed from nextLine to next
 		}
 		System.out.println();
 		return result.equalsIgnoreCase("Y");
@@ -219,11 +234,11 @@ public class UserInterface {
 	 */
 	public char queryDirection(String actionType) {
 		System.out.print("Which direction would you like to " + actionType + " in? (N/S/E/W)\nDirection: ");
-		String result = scanner.nextLine();
+		String result = scanner.next();//changed from nextLine to next
 		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("S")
 				|| result.equalsIgnoreCase("W") || result.equalsIgnoreCase("E"))) {
 			System.out.print("\nThats not a Cardinal direction! Please enter again either (N/S/W/W)\nDirection:");
-			result = scanner.nextLine();
+			result = scanner.next();//changed from nextLine to next
 		}
 		System.out.println();
 		return result.toLowerCase().charAt(0);
