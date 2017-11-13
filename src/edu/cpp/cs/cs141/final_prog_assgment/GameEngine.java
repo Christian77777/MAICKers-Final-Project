@@ -227,7 +227,7 @@ public class GameEngine {
 		player.setAmmo(false);
 		switch (direction) {
 		case 'n':
-			for (int i=playerLoc-9; i>0; i-=9) {
+			for (int i=playerLoc-9; i>=0; i-=9) {
 				if (game.isRoom(i))
 					break;
 				else if (game.checkFlag(i, 3, '1')) {
@@ -457,7 +457,7 @@ public class GameEngine {
 		for (int i=0; i<81; i++) {
 			boolean enemyMoved=false;
 			if (game.checkFlag(i, 3, '1')) {
-				for (int j=i-9; j>0; j-=9) {
+				for (int j=i-9; j>=0; j-=9) {
 					if (game.isRoom(j)) {
 						break;
 					}
@@ -534,7 +534,7 @@ public class GameEngine {
 			}
 			if (newNinjaLoc<0 || newNinjaLoc>80 || game.isRoom(newNinjaLoc))
 				validMove = false;
-			else if (newNinjaLoc%9==0 && direction==1) 
+			else if (newNinjaLoc%9==0 && direction==2) 
 				validMove = false;
 			else if ((newNinjaLoc+1)%9==0 && direction==3)
 				validMove = false;
