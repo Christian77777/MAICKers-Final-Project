@@ -127,7 +127,7 @@ public class GameBoard implements Serializable {
 			while(InvalidSpot) {			
 				num = r.nextInt(81);
 				if (!isRoom(num)) { 
-					if(!checkFlag(num, 2, 'a') && !checkFlag(num, 2, 'i') && !checkFlag(num, 2, 'r')) { 
+					if(!checkFlag(num, 2, 'a') && !checkFlag(num, 2, 'i') && !checkFlag(num, 2, 'r') && num != 72) { 
 						InvalidSpot = false;
 					}
 				}
