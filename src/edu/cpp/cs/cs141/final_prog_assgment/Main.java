@@ -77,7 +77,7 @@ public class Main {
 //		ui.printMap(b.getMapData(), 'e', false, false);
 		
 		GameEngine gameEngine = new GameEngine();
-		gameEngine.newGame();
+		gameEngine.startGame();
 		
 //		GameBoard gameBoard = new GameBoard();
 //		UserInterface ui = new UserInterface();

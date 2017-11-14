@@ -221,4 +221,21 @@ public class GameBoard implements Serializable {
 		}
 		return -1;
 	}
+	
+	/**
+	 * Loops through board array, finds how many ninjas are on the board and
+	 * places their locations into an appropriately sized array
+	 * @return int array with all ninja locations
+	 */
+	protected int[] getNinjaLoc(int numberOfNinjas) {
+		int[] ninjaLoc = new int[numberOfNinjas];
+		int j = 0;
+		for (int i=0; i<81; i++) {
+			if (checkFlag(i, 3, '1')) { 
+				ninjaLoc[j]=i;
+				j++;
+			}
+		}
+		return ninjaLoc;
+	}
 }
