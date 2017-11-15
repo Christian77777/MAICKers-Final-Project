@@ -49,7 +49,7 @@ public class UserInterface {
 	 * @return the Main Menu option selected by the user.
 	 */
 	public int welcomeMessage() {
-		System.out.println("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
+		System.out.print("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
 				+ "4. Quit?\nChoice: ");
 		int input = 0;
 		try {
