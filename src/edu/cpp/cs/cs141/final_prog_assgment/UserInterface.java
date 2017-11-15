@@ -49,13 +49,8 @@ public class UserInterface {
 	 * @return the Main Menu option selected by the user.
 	 */
 	public int welcomeMessage() {
-		System.out.println("Welcome to the Spy Game!");
-		//TODO
-		//Needs to print out options
-		//1. Start New Game
-		//2. Load Game
-		//3. Help
-		//4. ???
+		System.out.println("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
+				+ "4. Quit?\nChoice: ");
 		int input = 0;
 		try {
 			input = scanner.nextInt();
@@ -68,13 +63,12 @@ public class UserInterface {
 		}
 		return input;
 	}
-	
+
 	/**
-	 * Display help to the User 
+	 * Display help to the User
 	 */
-	public void printHelp()
-	{
-		
+	public void printHelp() {
+
 	}
 
 	/**
@@ -87,8 +81,8 @@ public class UserInterface {
 	 * @return a verified integer corresponding to a action
 	 */
 	public int pickTurn(boolean canLook, boolean canShoot) {
-		//TODO
-		//add an option for the user to save the game. 
+		// TODO
+		// add an option for the user to save the game.
 		ArrayList<Integer> options = new ArrayList<Integer>();
 		StringBuilder builder = new StringBuilder("What would you like to do?");
 		builder.append("\n1. Move");
@@ -110,7 +104,7 @@ public class UserInterface {
 		options.add(-1);
 		builder.append("\nOption: ");
 		do {
-			System.out.println(builder.toString());
+			System.out.print(builder.toString());
 			try {
 				int result = scanner.nextInt();
 				scanner.nextLine();
@@ -130,13 +124,26 @@ public class UserInterface {
 	 * 
 	 * @param victorious
 	 *            if the Player won, or AI won
+	 * @return if the player wants to restart the game
 	 */
-	public void printGameOver(boolean victorious) {
-		if (victorious) {//I added this in. feel free to change the string it prints
+	public boolean printGameOver(boolean victorious) {
+		if (victorious) {
 			System.out.println("Congratulations you won!");
-		}
-		else
+		} else {
 			System.out.println("You Lost all your lives. Game Over");
+		}
+		System.out.println("Would you like to play again? (Y/N)\n Response: ");
+		String result = scanner.next();
+		scanner.nextLine();
+		while (!(result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
+			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
+			result = scanner.next();
+			scanner.nextLine();
+		}
+		System.out.println();
+		return result.equalsIgnoreCase("Y");
+		
+
 	}
 
 	/**
@@ -177,9 +184,10 @@ public class UserInterface {
 		do {
 			String result = scanner.nextLine();
 			try {
-				// TODO verify that entered Strings are acceptable in File Name (does this actually work?)
-				//sysout only to see the result, not to be reprinted
-				//must pass in save directory
+				// TODO verify that entered Strings are acceptable in File Name (does this
+				// actually work?)
+				// sysout only to see the result, not to be reprinted
+				// must pass in save directory
 				System.out.println(Paths.get("dir" + File.separator + result + ".ser"));
 				return result;
 			} catch (InvalidPathException p) {
@@ -218,12 +226,13 @@ public class UserInterface {
 	 */
 	public boolean offerDifficulty() {
 		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
-		String result = scanner.next(); //changed from nextLine to next
+		String result = scanner.next(); // changed from nextLine to next
 		scanner.nextLine();
-		//TODO this statement in the while loop should be checking if it DOESN't equal yes or no
+		// TODO this statement in the while loop should be checking if it DOESN't equal
+		// yes or no
 		while (!(result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
 			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
-			result = scanner.next(); //changed from nextLine to next
+			result = scanner.next(); // changed from nextLine to next
 			scanner.nextLine();
 		}
 		System.out.println();
@@ -239,11 +248,11 @@ public class UserInterface {
 	 */
 	public char queryDirection(String actionType) {
 		System.out.print("Which direction would you like to " + actionType + " in? (N/S/E/W)\nDirection: ");
-		String result = scanner.next();//changed from nextLine to next
+		String result = scanner.next();// changed from nextLine to next
 		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("S")
 				|| result.equalsIgnoreCase("W") || result.equalsIgnoreCase("E"))) {
 			System.out.print("\nThats not a Cardinal direction! Please enter again either (N/S/W/W)\nDirection:");
-			result = scanner.next();//changed from nextLine to next
+			result = scanner.next();// changed from nextLine to next
 		}
 		System.out.println();
 		return result.toLowerCase().charAt(0);
@@ -266,6 +275,14 @@ public class UserInterface {
 	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
 		char[][] board = formatMap(map, lookDirection, debug, radarActive);
 		String console = "";
+		/*int z = 0;
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				console += "[" + map[z] + "]";
+				z++;
+			}
+			console += "\n";
+		}*/
 		for (int x = 0; x < 9; x++) {
 			for (int y = 0; y < 9; y++) {
 				console += "[" + board[x][y] + "]";
@@ -378,14 +395,14 @@ public class UserInterface {
 		}
 		return board;
 	}
-	
+
 	public void printRoomContents(boolean briefcase) {
 		if (briefcase)
 			System.out.println("The briefcase is in this room!");
 		else
 			System.out.println("This room is empty.");
 	}
-	
+
 	public void printPowerUp(char item) {
 		if (item == 'a')
 			System.out.println("You've found a bullet! You now have max ammo");
