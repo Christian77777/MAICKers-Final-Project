@@ -60,6 +60,8 @@ public class UserInterface {
 		if (input == 1)// Print Messages before anything if needed
 		{
 			System.out.println("Starting Game");
+		} else if (input == 4) {
+			System.exit(0);
 		}
 		return input;
 	}
@@ -100,7 +102,9 @@ public class UserInterface {
 			builder.append("\n- No Ammo");
 		}
 		builder.append("\n4. Save");
+		builder.append("\n5. Quit");
 		options.add(4);
+		options.add(5);
 		options.add(-1);
 		builder.append("\nOption: ");
 		do {
@@ -109,6 +113,9 @@ public class UserInterface {
 				int result = scanner.nextInt();
 				scanner.nextLine();
 				if (options.contains(result)) {
+					if (result == 5) {
+						System.exit(0);
+					}
 					return result;
 				}
 				System.out.println("This is not a option");
@@ -142,7 +149,6 @@ public class UserInterface {
 		}
 		System.out.println();
 		return result.equalsIgnoreCase("Y");
-		
 
 	}
 
@@ -275,14 +281,10 @@ public class UserInterface {
 	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
 		char[][] board = formatMap(map, lookDirection, debug, radarActive);
 		String console = "";
-		/*int z = 0;
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 9; y++) {
-				console += "[" + map[z] + "]";
-				z++;
-			}
-			console += "\n";
-		}*/
+		/*
+		 * int z = 0; for (int x = 0; x < 9; x++) { for (int y = 0; y < 9; y++) {
+		 * console += "[" + map[z] + "]"; z++; } console += "\n"; }
+		 */
 		for (int x = 0; x < 9; x++) {
 			for (int y = 0; y < 9; y++) {
 				console += "[" + board[x][y] + "]";
