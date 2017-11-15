@@ -93,7 +93,6 @@ public class UserInterface {
 		StringBuilder builder = new StringBuilder("What would you like to do?");
 		builder.append("\n1. Move");
 		options.add(1);
-		options.add(-1);///ADDED for debug mode
 		if (canLook) {
 			builder.append("\n2. Look");
 			options.add(2);
@@ -106,18 +105,22 @@ public class UserInterface {
 		} else {
 			builder.append("\n- No Ammo");
 		}
+		builder.append("\n4. Save");
+		options.add(4);
+		options.add(-1);
 		builder.append("\nOption: ");
 		do {
 			System.out.println(builder.toString());
 			try {
 				int result = scanner.nextInt();
+				scanner.nextLine();
 				if (options.contains(result)) {
 					return result;
 				}
 				System.out.println("This is not a option");
 			} catch (InputMismatchException i) {
-				//TODO Game infinitely loops if they enter something that isn't a number
 				System.out.println("That is not a even a Number!");
+				scanner.nextLine();
 			}
 		} while (true);
 	}
@@ -216,10 +219,12 @@ public class UserInterface {
 	public boolean offerDifficulty() {
 		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
 		String result = scanner.next(); //changed from nextLine to next
+		scanner.nextLine();
 		//TODO this statement in the while loop should be checking if it DOESN't equal yes or no
-		while (result.length() != 1 && (result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
+		while (!(result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
 			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
 			result = scanner.next(); //changed from nextLine to next
+			scanner.nextLine();
 		}
 		System.out.println();
 		return result.equalsIgnoreCase("Y");
