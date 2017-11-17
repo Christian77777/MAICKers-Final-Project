@@ -75,8 +75,12 @@ public class Main {
 //		ui.printMap(b.getMapData(), 'f', false, true);
 //		ui.printMap(b.getMapData(), 'n', false, false);
 //		ui.printMap(b.getMapData(), 'e', false, false);
-		
-		GameEngine gameEngine = new GameEngine();
+		boolean guiUsed = false;
+		if(args.length == 1 && args[0].equals("-gui"))
+		{
+			guiUsed = true;
+		}
+		GameEngine gameEngine = new GameEngine(guiUsed);
 		gameEngine.startGame();
 		
 //		GameBoard gameBoard = new GameBoard();

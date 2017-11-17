@@ -90,8 +90,15 @@ public class GameEngine {
 	
 	private String[] board;
 	
-	public GameEngine() {
-		ui = new UserInterface();
+	public GameEngine(boolean gui) {
+		if(gui)
+		{
+			ui = new GraphicalUI();
+		}
+		else
+		{
+			ui = new ConsoleUI();
+		}
 	}
 
 	/**
