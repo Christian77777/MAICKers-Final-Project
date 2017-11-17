@@ -133,13 +133,13 @@ public class UserInterface {
 	 *            if the Player won, or AI won
 	 * @return if the player wants to restart the game
 	 */
-	public boolean printGameOver(boolean victorious) {
+	public void printGameOver(boolean victorious) {
 		if (victorious) {
 			System.out.println("Congratulations you won!");
 		} else {
 			System.out.println("You Lost all your lives. Game Over");
 		}
-		System.out.println("Would you like to play again? (Y/N)\n Response: ");
+		System.out.print("Would you like to play again? (Y/N)\nResponse: ");
 		String result = scanner.next();
 		scanner.nextLine();
 		while (!(result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
@@ -147,9 +147,10 @@ public class UserInterface {
 			result = scanner.next();
 			scanner.nextLine();
 		}
+		if (result.equalsIgnoreCase("N")) {
+			System.exit(0);
+		}
 		System.out.println();
-		return result.equalsIgnoreCase("Y");
-
 	}
 
 	/**
