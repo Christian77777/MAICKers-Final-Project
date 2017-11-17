@@ -111,10 +111,7 @@ public class GameEngine {
 		else if (mainMenuOption == 2)
 			loadGame(ui.queryLoadFileName());
 		else if (mainMenuOption == 3)
-			help();
-		else if (mainMenuOption == 0)
-			System.exit(0);
-			
+			help();		
 	}
 
 	/**
@@ -124,6 +121,7 @@ public class GameEngine {
 		game = new GameBoard();
 		player = new Player();
 		numberOfNinjas = 6;
+		turnCount = 0;
 		victory = false;
 		gameOver = false;
 		playerLoc = game.getPlayerLoc();
@@ -190,7 +188,8 @@ public class GameEngine {
 	 * Quickly displays a help Menu, and reprint the main menu
 	 */
 	public void help() {
-		//TODO
+		ui.printHelp();
+		startGame();
 	}
 	
 	/**
@@ -287,29 +286,20 @@ public class GameEngine {
 	 */
 	public boolean attemptNinjaStab() {
 		boolean stab = false;
-		for (int i=0; i<81; i++) {
-			if (game.checkFlag(i, 3, '1')) {
-				if (i-9==playerLoc)
-					stab = true;
-				else if (i+9==playerLoc)
-					stab = true;
-				else if (playerLoc%9!=0 && i+1==playerLoc)
-					stab = true;
-				else if (i-1==playerLoc && i%9!=0)
-					stab = true;
-			}
+		int[] ninjaLoc = game.getNinjaLoc(numberOfNinjas);
+		for (int i=0; i<ninjaLoc.length; i++) {
+			if (ninjaLoc[i]-9==playerLoc)
+				stab = true;
+			else if (ninjaLoc[i]+9==playerLoc)
+				stab = true;
+			else if ( ninjaLoc[i]+1==playerLoc && playerLoc%9!=0)
+				stab = true;
+			else if (ninjaLoc[i]-1==playerLoc && i%9!=0)
+				stab = true;
+			else if (ninjaLoc[i]==playerLoc)
+				stab = true;
 		}
 		return stab;
-	}
-
-	/**
-	 * Call a showMap method with Extra visibility
-	 * 
-	 * @param direction
-	 *            to look in
-	 */
-	public void lookInDirection(char direction) {
-		//Don't think we need this method anymore
 	}
 
 	/**
@@ -439,8 +429,10 @@ public class GameEngine {
 				else {
 					if (i>0) {
 						for (int n=i-1; n>=0; n--) {
-							if (newNinjaLoc[i]==newNinjaLoc[n])
+							if (newNinjaLoc[i]==newNinjaLoc[n]) {
 								validMove=false;
+								break;
+							}
 						}
 					}
 				}
@@ -448,6 +440,8 @@ public class GameEngine {
 		}
 		for (int i=0; i<ninjaLoc.length; i++) {
 			game.setFlag(ninjaLoc[i], 3, '0');
+		}
+		for(int i=0; i<ninjaLoc.length; i++) {
 			game.setFlag(newNinjaLoc[i], 3, '1');
 		}
 	}
@@ -501,25 +495,34 @@ public class GameEngine {
 					}
 				}
 			}
+			if (enemyMoved) {
+				for (int n=i-1; n>=0; n--) {
+					if (newNinjaLoc[i]==newNinjaLoc[n]) {
+						enemyMoved = false;
+						break;
+					}
+				}
+			}
 			if(!enemyMoved) {
 				boolean validMove;
 				do {
 					validMove = true;
 					newNinjaLoc[i]=singleRandomEnemyMove(ninjaLoc[i]);
-					if (i>0) {
-						for (int n=i-1; n>0; n--) {
-							if (newNinjaLoc[i]==newNinjaLoc[n]) {
-								newNinjaLoc[i]=singleRandomEnemyMove(ninjaLoc[i]);
-								validMove = false;
-							}
-						}	
-					}
+					for (int n=i-1; n>=0; n--) {
+						if (newNinjaLoc[i]==newNinjaLoc[n]) {
+							validMove = false;
+							break;
+						}
+					}	
 				} while (!validMove);
 			}
 			//ui.printMap(board, 'f', debug, radar);//TEST
 		}
 		for (int i=0; i<ninjaLoc.length; i++) {
+			//System.out.println(i+"    "+ninjaLoc[i]+"     "+newNinjaLoc[i]);//TEST
 			game.setFlag(ninjaLoc[i], 3, '0');
+		}
+		for (int i=0; i<ninjaLoc.length; i++) {
 			game.setFlag(newNinjaLoc[i], 3, '1');
 		}
 		
