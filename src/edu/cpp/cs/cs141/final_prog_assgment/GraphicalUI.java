@@ -3,6 +3,10 @@
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 /**
  * @author Christian77777
  *
@@ -11,7 +15,8 @@ public class GraphicalUI extends UserInterface {
 
 	
 	public GraphicalUI(){
-		
+		System.out.println("GUI Enabled, Ignoring Console");
+		JOptionPane.showMessageDialog(null, "GUI Enabled, but Incomplete", "Incomplete Code", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
 	}
 	
 	@Override
