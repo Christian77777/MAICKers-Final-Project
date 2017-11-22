@@ -108,8 +108,10 @@ public class GameEngine {
 		int mainMenuOption = ui.welcomeMessage();
 		if (mainMenuOption == 1)
 			newGame();
-		else if (mainMenuOption == 2)
-			loadGame(ui.queryLoadFileName());
+		else if (mainMenuOption == 2) {
+			String x = ui.queryLoadFileName();
+			loadGame(x);
+		}
 		else if (mainMenuOption == 3)
 			help();		
 	}
@@ -158,12 +160,19 @@ public class GameEngine {
 			FileInputStream in = new FileInputStream("dir" + fileName);
 			ObjectInputStream ois = new ObjectInputStream(in);
 			game = (GameBoard) ois.readObject();
+			player = (Player) ois.readObject();
+			numberOfNinjas = (int) ois.readInt();
+			turnCount = (int) ois.readInt();
+			invincibility = (boolean) ois.readBoolean();
+			radar = (boolean) ois.readBoolean();
+			playerLoc = (int) ois.readInt();
+			hardmode = (boolean) ois.readBoolean();
+			board = (String[]) ois.readObject();
 			ois.close();
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		runGame();
+		}finally{runGame();}
 	}
 
 	/**
@@ -173,10 +182,19 @@ public class GameEngine {
 	 *            name of the File to save as.
 	 */
 	public void saveGame(String fileName) {
+		
 		try {
 			FileOutputStream out = new FileOutputStream("dir" + fileName);
 			ObjectOutputStream oos = new ObjectOutputStream(out);
 			oos.writeObject(game);
+			oos.writeObject(player);
+			oos.writeInt(numberOfNinjas);
+			oos.writeInt(turnCount);
+			oos.writeBoolean(invincibility);
+			oos.writeBoolean(radar);
+			oos.writeInt(playerLoc);
+			oos.writeBoolean(hardmode);
+			oos.writeObject(board);
 			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
