@@ -1,5 +1,17 @@
 /**
- * 
+ * CS 141: Intro to Programming and Problem Solving
+ * Professor: Edwin Rodr&iacute;guez
+ *
+ * Programming Assignment #Final
+ *
+ * Small Text Based Game of Spy versus Ninjas, where you get to shoot, move, and look
+ *
+ * Team MAICKers
+ *	Isaiah Britto
+ * 	Angela Gadon
+ * 	Kiana Ziglari
+ * 	Christian Devile
+ * 	Michael John Bradford
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
@@ -22,8 +34,7 @@ import javax.swing.JTextArea;
 import javax.swing.JSeparator;
 
 /**
- * @author Christian77777
- *
+ * This Class is the Implementation of the Option GUI Interface for the Program
  */
 public class GraphicalUI extends UserInterface {
 	private JFrame frame;
@@ -130,9 +141,15 @@ public class GraphicalUI extends UserInterface {
 				JOptionPane.INFORMATION_MESSAGE,
 				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
 	}
+	
+	@Override
+	public void welcomeMessage()
+	{
+		
+	}
 
 	@Override
-	public int welcomeMessage() {
+	public int printMainMenu() {
 		menuPanel.setVisible(true);
 		txtArea.setText("Please Select a Main Menu Option");
 		latch = new CountDownLatch(1);

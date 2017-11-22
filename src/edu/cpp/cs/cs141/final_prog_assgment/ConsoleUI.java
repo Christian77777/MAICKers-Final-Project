@@ -38,10 +38,16 @@ public class ConsoleUI extends UserInterface{
 	public ConsoleUI() {
 		scanner = new Scanner(System.in);
 	}
+	
+	@Override
+	public void welcomeMessage()
+	{
+		System.out.println("Welcome to the Spy Game!");
+	}
 
 	@Override
-	public int welcomeMessage() {
-		System.out.print("Welcome to the Spy Game!\n\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
+	public int printMainMenu() {
+		System.out.print("Main Menu\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
 				+ "4. Quit?\nChoice: ");
 		int input = 0;
 		boolean validInput = false;

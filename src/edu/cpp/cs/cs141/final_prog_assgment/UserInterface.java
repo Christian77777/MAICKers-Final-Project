@@ -32,11 +32,15 @@ public abstract class UserInterface{
 	}
 	
 	/**
-	 * Display Welcome Message, and return a Main Menu Option
-	 * 
+	 * Display Welcome Message only, display Menu with {@link #printMainMenu()}
+	 */
+	public abstract void welcomeMessage();
+	
+	/**
+	 * Display Main Menu, and return chosen Option
 	 * @return the Main Menu option selected by the user.
 	 */
-	public abstract int welcomeMessage();
+	public abstract int printMainMenu();
 	
 	/**
 	 * Display help to the User
