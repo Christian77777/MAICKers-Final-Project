@@ -41,21 +41,23 @@ public class ConsoleUI extends UserInterface{
 
 	@Override
 	public int welcomeMessage() {
-		System.out.print("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
+		System.out.print("Welcome to the Spy Game!\n\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
 				+ "4. Quit?\nChoice: ");
 		int input = 0;
-		try {
-			input = scanner.nextInt();
-		} catch (Exception i) {
-
-		}
-		if (input == 1)// Print Messages before anything if needed
-		{
-			System.out.println("Starting Game");
-		}else if (input == 3) {
-			
-		}else if (input == 4) {
-			System.exit(0);
+		boolean validInput = false;
+		while (!validInput) {
+			try {
+				input = scanner.nextInt();
+				if (input<1 || input>4)
+					System.out.println("Please Enter A Number From 0-4.");
+				else if (input == 4)
+					System.exit(0);
+				else
+					validInput = true;
+			} catch (Exception i) {
+				System.out.println("This Isn't A Number!");
+				scanner.nextLine();
+			}
 		}
 		return input;
 	}
@@ -353,7 +355,7 @@ public class ConsoleUI extends UserInterface{
 		String result = scanner.next();
 		scanner.nextLine();
 		while (!(result.equalsIgnoreCase("N") || result.equalsIgnoreCase("Y"))) {
-			System.out.print("\nThats not a Option! Please enter again either (Y/N)\nResponse:");
+			System.out.print("\n\nThats not a Option! Please enter again either (Y/N)\nResponse:");
 			result = scanner.next();
 			scanner.nextLine();
 		}
@@ -445,7 +447,7 @@ public class ConsoleUI extends UserInterface{
 
 	@Override
 	public boolean offerDifficulty() {
-		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
+		System.out.print("\nWould you like to enable the ninja AI? (Y/N)\nResponse: ");
 		String result = scanner.next(); // changed from nextLine to next
 		scanner.nextLine();
 		// TODO this statement in the while loop should be checking if it DOESN't equal
