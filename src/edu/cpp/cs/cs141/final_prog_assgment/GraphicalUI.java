@@ -182,7 +182,7 @@ public class GraphicalUI extends UserInterface {
 	}
 
 	@Override
-	public String queryLoadFileName() {
+	public String queryLoadFileName(String[] saves) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -15,6 +15,7 @@
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -90,6 +91,8 @@ public class GameEngine {
 	
 	private String[] board;
 	
+	private static final String savePath = new String(System.getProperty("user.home")+ File.separator + "Documents" + File.separator + "MaickerGames");
+	
 	public GameEngine(boolean gui) {
 		if(gui)
 		{
@@ -109,7 +112,7 @@ public class GameEngine {
 		if (mainMenuOption == 1)
 			newGame();
 		else if (mainMenuOption == 2) {
-			String x = ui.queryLoadFileName();
+			String x = ui.queryLoadFileName(new File(savePath).list());
 			loadGame(x);
 		}
 		else if (mainMenuOption == 3)
@@ -156,9 +159,9 @@ public class GameEngine {
 	 *            The name of the binary File to load
 	 */
 	public void loadGame(String fileName) {
-		try {
-			FileInputStream in = new FileInputStream("dir" + fileName);
-			ObjectInputStream ois = new ObjectInputStream(in);
+		new File(savePath).mkdirs();
+		try(FileInputStream in = new FileInputStream(savePath + File.separator + fileName);
+				ObjectInputStream ois = new ObjectInputStream(in);) {
 			game = (GameBoard) ois.readObject();
 			player = (Player) ois.readObject();
 			numberOfNinjas = (int) ois.readInt();
@@ -168,9 +171,8 @@ public class GameEngine {
 			playerLoc = (int) ois.readInt();
 			hardmode = (boolean) ois.readBoolean();
 			board = (String[]) ois.readObject();
-			ois.close();
 		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Oops, failed to Load File!");
 			e.printStackTrace();
 		}finally{
 			runGame();
@@ -184,10 +186,11 @@ public class GameEngine {
 	 *            name of the File to save as.
 	 */
 	public void saveGame(String fileName) {
-		
-		try {
-			FileOutputStream out = new FileOutputStream("dir" + fileName);
-			ObjectOutputStream oos = new ObjectOutputStream(out);
+		new File(savePath).mkdirs();
+		String path = (savePath + File.separator + fileName + ".ser");
+		System.out.println("Saving to: " + path);
+		try(FileOutputStream out = new FileOutputStream(path);
+				ObjectOutputStream oos = new ObjectOutputStream(out);){
 			oos.writeObject(game);
 			oos.writeObject(player);
 			oos.writeInt(numberOfNinjas);
@@ -199,7 +202,7 @@ public class GameEngine {
 			oos.writeObject(board);
 			out.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Oops, failed to Save File!");
 			e.printStackTrace();
 		}
 	}

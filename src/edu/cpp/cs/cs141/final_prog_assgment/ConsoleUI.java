@@ -39,6 +39,7 @@ public class ConsoleUI extends UserInterface{
 		scanner = new Scanner(System.in);
 	}
 
+	@Override
 	public int welcomeMessage() {
 		System.out.print("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
 				+ "4. Quit?\nChoice: ");
@@ -62,6 +63,7 @@ public class ConsoleUI extends UserInterface{
 	
 	
 	
+	@Override
 	public void printHelp() {
 		System.out.print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.print("\n\t\t\t\t Welcome to the Spy Game!");
@@ -295,6 +297,7 @@ public class ConsoleUI extends UserInterface{
 		System.out.print("\n\t To choose any option simply enter the corresponding number followed by pressing\n\t the 'enter' key.");
 	}
 
+	@Override
 	public int pickTurn(boolean canLook, boolean canShoot) {
 		// TODO
 		// add an option for the user to save the game.
@@ -339,6 +342,7 @@ public class ConsoleUI extends UserInterface{
 		} while (true);
 	}
 
+	@Override
 	public boolean printGameOver(boolean victorious) {
 		if (victorious) {
 			System.out.println("Congratulations you won!");
@@ -358,6 +362,7 @@ public class ConsoleUI extends UserInterface{
 
 	}
 
+	@Override
 	public void printShotResult(boolean result) {
 		double dice = Math.random();
 		if (result) {
@@ -383,6 +388,7 @@ public class ConsoleUI extends UserInterface{
 		}
 	}
 
+	@Override
 	public String querySaveFileName() {
 		System.out.println("What would you like to name your Save file to?\nName: ");
 		do {
@@ -401,20 +407,43 @@ public class ConsoleUI extends UserInterface{
 		} while (true);
 	}
 
+	@Override
 	public void printInvalidMove() {
 		System.out.println("You can not move in that direction! Pick another Direction");
 	}
 
-	public String queryLoadFileName() {
-		System.out.println("What is the saved file name?");
-		scanner.nextLine();
-		return scanner.nextLine();
+	@Override
+	public String queryLoadFileName(String[] saves) {
+		StringBuilder builder = new StringBuilder("\nWhich Save file do you wish to boot?");
+		ArrayList<Integer> options = new ArrayList<Integer>();
+		for(int x = 0; x < saves.length; x++)
+		{
+			builder.append("\n\t" + (x + 1) + ". - " + saves[x].substring(0, saves[x].length()-4));
+			options.add(x+1);
+		}
+		builder.append("\nSave File: ");
+		do {
+			System.out.print(builder.toString());
+			try {
+				int result = scanner.nextInt();
+				scanner.nextLine();
+				if (options.contains(result)) {
+					return saves[result-1];
+				}
+				System.out.println("This is not a Save File");
+			} catch (InputMismatchException i) {
+				System.out.println("That is not a even a Number!");
+				scanner.nextLine();
+			}
+		} while (true);
 	}
 
+	@Override
 	public void printDamaged() {
 		System.out.println("A Ninja got you! You are forced to retreat to the Starting Point");
 	}
 
+	@Override
 	public boolean offerDifficulty() {
 		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
 		String result = scanner.next(); // changed from nextLine to next
@@ -430,6 +459,7 @@ public class ConsoleUI extends UserInterface{
 		return result.equalsIgnoreCase("Y");
 	}
 
+	@Override
 	public char queryDirection(String actionType) {
 		System.out.print("Which direction would you like to " + actionType + " in? (N/S/E/W)\nDirection: ");
 		String result = scanner.next();// changed from nextLine to next
@@ -456,6 +486,7 @@ public class ConsoleUI extends UserInterface{
 	 * @param radarActive
 	 *            if the suitcase should be shown
 	 */
+	@Override
 	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
 		char[][] board = formatMap(map, lookDirection, debug, radarActive);
 		String console = "";
@@ -474,6 +505,7 @@ public class ConsoleUI extends UserInterface{
 		System.out.println(console);
 	}
 
+	@Override
 	public void printRoomContents(boolean briefcase) {
 		if (briefcase)
 			System.out.println("The briefcase is in this room!");
@@ -481,6 +513,7 @@ public class ConsoleUI extends UserInterface{
 			System.out.println("This room is empty.");
 	}
 
+	@Override
 	public void printPowerUp(char item) {
 		if (item == 'a')
 			System.out.println("You've found a bullet! You now have max ammo");

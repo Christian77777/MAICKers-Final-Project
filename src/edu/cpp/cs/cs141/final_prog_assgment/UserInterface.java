@@ -86,7 +86,7 @@ public abstract class UserInterface{
 	 * 
 	 * @return the file name
 	 */
-	public abstract String queryLoadFileName();
+	public abstract String queryLoadFileName(String[] saves);
 	
 	/**
 	 * Print warning message that the player lost a life, and returned to 0,0
