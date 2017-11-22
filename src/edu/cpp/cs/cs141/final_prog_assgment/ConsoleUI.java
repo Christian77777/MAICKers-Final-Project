@@ -42,6 +42,7 @@ public class ConsoleUI extends UserInterface{
 	@Override
 	public void welcomeMessage()
 	{
+		printPicture(true);
 		System.out.println("Welcome to the Spy Game!");
 	}
 
@@ -90,7 +91,7 @@ public class ConsoleUI extends UserInterface{
 				+ "\nfinds YOU?! Enter 1 to start a new game and see for yourself if you are worthy to be"
 				+ "\ncalled a Spy or are you just a want-to-be Spy.. :(");
 		System.out.print("\n__________________________________________________________________________________________");
-		printPictures();
+		printPicture(false);
 			
 	}
 	
@@ -154,7 +155,8 @@ public class ConsoleUI extends UserInterface{
 		System.out.print("\nLoading a Previous Game\n\t...");
 	}
 
-	private void printPictures() {
+	private void printPicture(boolean first) {
+		if(first){
 		System.out.println("\n      \u00B6\u00B6\r\n" + 
 					"      \u00B6\u00B6              \u00B6\u00b6\u00B6\u00B6\u00B6\r\n" + 
 					"      \u00B6\u00B6\u00B6            \u00B6\u00B6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
@@ -202,6 +204,7 @@ public class ConsoleUI extends UserInterface{
 					" \u00b6\u00b6\u00b6 \u00b6                                  \u00b6\u00b6\u00b6\u00b6\r\n" + 
 					"\u00b6\u00b6\u00b6\u00b6 \u00b6                                 \u00b6\u00b6\u00b6 \u00b6\r\n" + 
 					"                                      \u00b6\u00b6\u00b6\u00b6 \u00b6");
+		} else {
 			System.out.println("111111¶11111111111111111111111111111111111111 \r\n" + 
 					"111111¶11111111111111111111111111111111111111\r\n" + 
 					"11111 ¶¶1111111111111111111111111111111111111\r\n" + 
@@ -253,6 +256,7 @@ public class ConsoleUI extends UserInterface{
 					"1111111111111111111111111111¶¶¶    ¶¶¶ ¶¶1111\r\n" + 
 					"111111111111111111111111111111¶¶¶¶    ¶¶¶1111\r\n" + 
 					"11111111111111111111111111111111¶¶¶¶¶¶¶¶11111");
+		}
 	}
 
 	public void printObject() {
