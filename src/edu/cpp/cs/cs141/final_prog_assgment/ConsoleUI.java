@@ -66,6 +66,7 @@ public class ConsoleUI extends UserInterface{
 				scanner.nextLine();
 			}
 		}
+		clearScreen();
 		return input;
 	}
 
@@ -79,19 +80,44 @@ public class ConsoleUI extends UserInterface{
 		System.out.print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		printObject();
 		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
+		System.out.print("\n__________________________________________________________________________________________");
 		printStartMenu();
+		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
 		System.out.print("\n__________________________________________________________________________________________");
 		printStartGame();
 		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
+		System.out.print("\n__________________________________________________________________________________________");
 		printLoadGame();
+		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
 		System.out.print("\n__________________________________________________________________________________________");
 		printPowerUps();
 		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
+		System.out.print("\n__________________________________________________________________________________________");
 		System.out.print("\nDo you think you have what it takes to find the room with the briefcase before a Ninja"
 				+ "\nfinds YOU?! Enter 1 to start a new game and see for yourself if you are worthy to be"
-				+ "\ncalled a Spy or are you just a want-to-be Spy.. :(");
+				+ "\ncalled a Spy or are you just a wanna-be Spy?");
 		System.out.print("\n__________________________________________________________________________________________");
+		pressEnterToContinue();
+		clearScreen();
+		
 		printPicture(false);
+		pressEnterToContinue();
+		clearScreen();
 			
 	}
 	
@@ -303,11 +329,29 @@ public class ConsoleUI extends UserInterface{
 				"\n\t\t\t pictures below that, when entered after a game is going, will"+
 				"\n\t\t\t allow you to see where everything is located on the board! Can "+
 				"\n\t\t\t you find the secrete code?");
-		System.out.print("\n\t\t 4. Qiut?\n\t\t\t Choosing this allows you to close the game before you begin. If"+
+		System.out.print("\n\t\t 4. Quit?\n\t\t\t Choosing this allows you to close the game before you begin. If"+
 				"\n\t\t\t you so wish to crawl into a ball and admit defeat to the nijas"+
 				"\n\t\t\t beforehand, this is your option to quit now.");
 		System.out.print("\n\t To choose any option simply enter the corresponding number followed by pressing\n\t the 'enter' key.");
 	}
+	
+	 private void pressEnterToContinue()
+	 { 
+	        System.out.println("\nPress Enter key to continue...");
+	        try
+	        {
+	        	System.in.read(new byte[System.in.available()]);
+	            System.in.read();
+	        }  
+	        catch(Exception e)
+	        {}  
+	 }
+	 
+	 private void clearScreen() {
+		 for(int i = 0; i< 80; i++) {
+			 System.out.println();
+		 }
+	 }
 
 	@Override
 	public int pickTurn(boolean canLook, boolean canShoot) {
@@ -370,6 +414,8 @@ public class ConsoleUI extends UserInterface{
 			scanner.nextLine();
 		}
 		System.out.println();
+		clearScreen();
+		
 		return result.equalsIgnoreCase("Y");
 
 	}
@@ -395,7 +441,7 @@ public class ConsoleUI extends UserInterface{
 			} else if (dice < .75) {
 				System.out.println("Stop shooting blindly, you missed them all");
 			} else if (dice < 1.0) {
-				System.out.println("Shooted in the wrong direction");
+				System.out.println("Shot in the wrong direction");
 			}
 		}
 	}
@@ -418,7 +464,14 @@ public class ConsoleUI extends UserInterface{
 			}
 		} while (true);
 	}
-
+	
+	@Override
+	public void confirmSaveFile(String path) {
+		System.out.println("Saving to: " + path);
+		pressEnterToContinue();
+		clearScreen();
+	}
+	
 	@Override
 	public void printInvalidMove() {
 		System.out.println("You can not move in that direction! Pick another Direction");
@@ -426,7 +479,7 @@ public class ConsoleUI extends UserInterface{
 
 	@Override
 	public String queryLoadFileName(String[] saves) {
-		StringBuilder builder = new StringBuilder("\nWhich Save file do you wish to boot?");
+		StringBuilder builder = new StringBuilder("\nWhich Save file do you wish to load?");
 		ArrayList<Integer> options = new ArrayList<Integer>();
 		for(int x = 0; x < saves.length; x++)
 		{
@@ -453,6 +506,8 @@ public class ConsoleUI extends UserInterface{
 	@Override
 	public void printDamaged() {
 		System.out.println("A Ninja got you! You are forced to retreat to the Starting Point");
+		pressEnterToContinue();
+		clearScreen();
 	}
 
 	@Override
@@ -468,6 +523,8 @@ public class ConsoleUI extends UserInterface{
 			scanner.nextLine();
 		}
 		System.out.println();
+		clearScreen();
+		
 		return result.equalsIgnoreCase("Y");
 	}
 
@@ -481,6 +538,7 @@ public class ConsoleUI extends UserInterface{
 			result = scanner.next();// changed from nextLine to next
 		}
 		System.out.println();
+		
 		return result.toLowerCase().charAt(0);
 	}
 
@@ -500,6 +558,7 @@ public class ConsoleUI extends UserInterface{
 	 */
 	@Override
 	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
+		clearScreen();
 		char[][] board = formatMap(map, lookDirection, debug, radarActive);
 		String console = "";
 		/*

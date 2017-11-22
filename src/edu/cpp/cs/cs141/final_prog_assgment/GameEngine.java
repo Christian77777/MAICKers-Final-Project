@@ -196,7 +196,7 @@ public class GameEngine {
 	public void saveGame(String fileName) {
 		new File(savePath).mkdirs();
 		String path = (savePath + File.separator + fileName + ".ser");
-		System.out.println("Saving to: " + path);
+		ui.confirmSaveFile(path);
 		try(FileOutputStream out = new FileOutputStream(path);
 				ObjectOutputStream oos = new ObjectOutputStream(out);){
 			oos.writeObject(game);

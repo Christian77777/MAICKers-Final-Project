@@ -80,6 +80,11 @@ public abstract class UserInterface{
 	public abstract String querySaveFileName();
 	
 	/**
+	 * Confirm to user where they are saving
+	 */
+	public abstract void confirmSaveFile(String path);
+	
+	/**
 	 * Display to User that they cant Move there
 	 */
 	public abstract void printInvalidMove();
