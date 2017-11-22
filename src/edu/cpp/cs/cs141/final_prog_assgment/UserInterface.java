@@ -31,28 +31,98 @@ public abstract class UserInterface{
 		return specialCoords;
 	}
 	
+	/**
+	 * Display Welcome Message, and return a Main Menu Option
+	 * 
+	 * @return the Main Menu option selected by the user.
+	 */
 	public abstract int welcomeMessage();
 	
+	/**
+	 * Display help to the User
+	 */
 	public abstract void printHelp();
 	
+	/**
+	 * Present the Player with their options on their turn, and verify their syntax
+	 * 
+	 * @param canLook
+	 *            if the Player has not yet looked
+	 * @param canShoot
+	 *            if the Player has ammo to shoot
+	 * @return a verified integer corresponding to a action
+	 */
 	public abstract int pickTurn(boolean canLook, boolean canShoot);
 	
+	/**
+	 * Print out a congratulations or game over screen
+	 * 
+	 * @param victorious
+	 *            if the Player won, or AI won
+	 * @return if the player wants to restart the game
+	 */
 	public abstract boolean printGameOver(boolean victorious);
 	
+	/**
+	 * Print if the player shot a Ninja DEAD
+	 */
 	public abstract void printShotResult(boolean result);
 	
+	/**
+	 * Ask User what to save name to this File as. Path is Locked
+	 * 
+	 * @return the name user Request to Save the file As
+	 */
 	public abstract String querySaveFileName();
 	
+	/**
+	 * Display to User that they cant Move there
+	 */
 	public abstract void printInvalidMove();
 	
+	/**
+	 * Get List of Every Save File in Directory, query user, for which they wish to
+	 * use.
+	 * 
+	 * @return the file name
+	 */
 	public abstract String queryLoadFileName();
 	
+	/**
+	 * Print warning message that the player lost a life, and returned to 0,0
+	 */
 	public abstract void printDamaged();
 	
+	/**
+	 * Print a query for the Difficulty to play the game at In Reality, define if
+	 * the AI should be enabled
+	 * 
+	 * @return the selected difficulty, where true means enable AI
+	 */
 	public abstract boolean offerDifficulty();
 	
+	/**
+	 * Gets a Direction from the UI
+	 * 
+	 * @param actionType
+	 *            What is the Direction entered in reference to
+	 * @return The Direction the user specified, as a char of either n,s,w,e
+	 */
 	public abstract char queryDirection(String actionType);
 	
+	/**
+	 * Prints out a Map to the UI
+	 * 
+	 * @param map
+	 *            the locations of all the entities
+	 * @param lookDirection
+	 *            'f' if no looking done. n/s/e/w otherwise to represent the 4
+	 *            directions
+	 * @param debug
+	 *            if Everything should just be revealed
+	 * @param radarActive
+	 *            if the suitcase should be shown
+	 */
 	public abstract void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive);
 	
 	/**
@@ -157,7 +227,15 @@ public abstract class UserInterface{
 		return board;
 	}
 	
+	/**
+	 * Show in UI if a the Spy found the Briefcase
+	 * @param briefcase if game won
+	 */
 	public abstract void printRoomContents(boolean briefcase);
 	
+	/**
+	 * Show in UI if which PowerUp was found
+	 * @param item
+	 */
 	public abstract void printPowerUp(char item);
 }

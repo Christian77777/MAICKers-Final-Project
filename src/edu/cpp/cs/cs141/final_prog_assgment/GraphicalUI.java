@@ -3,37 +3,157 @@
  */
 package edu.cpp.cs.cs141.final_prog_assgment;
 
-import javax.swing.Icon;
+import java.awt.Toolkit;
+
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.util.concurrent.CountDownLatch;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextArea;
+import javax.swing.JSeparator;
 
 /**
  * @author Christian77777
  *
  */
 public class GraphicalUI extends UserInterface {
+	private JFrame frame;
+	private JPanel mapPanel;
+	private JPanel menuPanel;
+	private JLabel[][] map = new JLabel[9][9];
+	private JButton btnNewGame;
+	private JButton btnLoadGame;
+	private JButton btnHelp;
+	private JButton btnQuit;
+	private JLabel lblMainMenu;
+	private JTextArea txtArea;
+	private int menuOption;
+	private CountDownLatch latch;
+	/**
+	 * Mode of GUI
+	 * 0 = Main Menu
+	 * 1 = Prompt Turn
+	 */
+	private int mode = 0;
+	private JSeparator separator1;
 
-	
-	public GraphicalUI(){
+	public GraphicalUI() {
+		frame = new JFrame("Spy Game");
+		frame.setIconImage(Toolkit.getDefaultToolkit()
+				.getImage(GraphicalUI.class.getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new MigLayout("", "[grow]", "[::500px][][][grow]"));
+		frame.setSize(800, 800);
+
+		mapPanel = new JPanel();
+		mapPanel.setBorder(new LineBorder(new Color(0, 0, 0), 4, true));
+		mapPanel.setLayout(new MigLayout("", "[][][][][][][][][]", "[][][][][][][][][]"));
+
+		menuPanel = new JPanel();
+		menuPanel.setBorder(null);
+		menuPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow]", "[][]"));
+
+		lblMainMenu = new JLabel("Main Menu");
+		menuPanel.add(lblMainMenu, "flowy,cell 0 0 4 1,alignx center");
+
+		btnNewGame = new JButton("New Game");
+		btnNewGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuOption = 1;
+				latch.countDown();
+			}
+		});
+		menuPanel.add(btnNewGame, "cell 0 1,growx");
+
+		btnLoadGame = new JButton("Load Game");
+		btnLoadGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuOption = 2;
+				latch.countDown();
+			}
+		});
+		menuPanel.add(btnLoadGame, "cell 1 1,growx");
+
+		btnHelp = new JButton("Help");
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuOption = 3;
+				latch.countDown();
+			}
+		});
+		menuPanel.add(btnHelp, "cell 2 1,growx");
+
+		btnQuit = new JButton("Quit");
+		btnQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuOption = 4;
+				latch.countDown();
+			}
+		});
+		
+		separator1 = new JSeparator();
+		frame.getContentPane().add(separator1, "cell 0 1,growx");
+		menuPanel.add(btnQuit, "cell 3 1,growx");
+		
+		frame.getContentPane().add(menuPanel, "cell 0 2,grow");
+		menuPanel.setVisible(false);
+
+		txtArea = new JTextArea();
+		txtArea.setText("Welcome to the Spy Game");
+		txtArea.setWrapStyleWord(true);
+		txtArea.setLineWrap(true);
+		txtArea.setEditable(false);
+		frame.getContentPane().add(txtArea, "cell 0 3,grow");
+
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				map[x][y] = new JLabel(new ImageIcon("/edu/cpp/cs/cs141/final_prog_assgment/logo.png"));
+				map[x][y].setIcon(
+						new ImageIcon(GraphicalUI.class.getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
+				mapPanel.add(map[x][y], "cell " + x + " " + y);
+			}
+
+		}
+		mapPanel.setVisible(false);
 		System.out.println("GUI Enabled, Ignoring Console");
-		JOptionPane.showMessageDialog(null, "GUI Enabled, but Incomplete", "Incomplete Code", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
+		frame.setVisible(true);
+		JOptionPane.showMessageDialog(null, "GUI Enabled, but Incomplete", "Incomplete Code",
+				JOptionPane.INFORMATION_MESSAGE,
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
 	}
-	
+
 	@Override
 	public int welcomeMessage() {
-		// TODO Auto-generated method stub
-		return 0;
+		menuPanel.setVisible(true);
+		txtArea.setText("Please Select a Main Menu Option");
+		latch = new CountDownLatch(1);
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		menuPanel.setVisible(false);
+		return menuOption;
 	}
 
 	@Override
 	public void printHelp() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public int pickTurn(boolean canLook, boolean canShoot) {
-		// TODO Auto-generated method stub
+
 		return 0;
 	}
 
@@ -46,7 +166,7 @@ public class GraphicalUI extends UserInterface {
 	@Override
 	public void printShotResult(boolean result) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -58,7 +178,7 @@ public class GraphicalUI extends UserInterface {
 	@Override
 	public void printInvalidMove() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -70,7 +190,7 @@ public class GraphicalUI extends UserInterface {
 	@Override
 	public void printDamaged() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -87,20 +207,27 @@ public class GraphicalUI extends UserInterface {
 
 	@Override
 	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
-		// TODO Auto-generated method stub
-		
+		char[][] formattedMap = formatMap(map,lookDirection,debug,radarActive);
+		for(int x = 0; x < 9; x++)
+		{
+			for(int y = 0; y < 9; y++)
+			{
+				
+			}
+		}
+
 	}
 
 	@Override
 	public void printRoomContents(boolean briefcase) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void printPowerUp(char item) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

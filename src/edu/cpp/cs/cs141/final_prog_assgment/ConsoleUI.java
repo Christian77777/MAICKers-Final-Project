@@ -39,11 +39,6 @@ public class ConsoleUI extends UserInterface{
 		scanner = new Scanner(System.in);
 	}
 
-	/**
-	 * Display Welcome Message, and return a Main Menu Option
-	 * 
-	 * @return the Main Menu option selected by the user.
-	 */
 	public int welcomeMessage() {
 		System.out.print("Welcome to the Spy Game!\n1. Start New Game\n" + "2. Load Game\n" + "3. Help\n"
 				+ "4. Quit?\nChoice: ");
@@ -67,9 +62,6 @@ public class ConsoleUI extends UserInterface{
 	
 	
 	
-	/**
-	 * Display help to the User
-	 */
 	public void printHelp() {
 		System.out.print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.print("\n\t\t\t\t Welcome to the Spy Game!");
@@ -303,15 +295,6 @@ public class ConsoleUI extends UserInterface{
 		System.out.print("\n\t To choose any option simply enter the corresponding number followed by pressing\n\t the 'enter' key.");
 	}
 
-	/**
-	 * Present the Player with their options on their turn, and verify their syntax
-	 * 
-	 * @param canLook
-	 *            if the Player has not yet looked
-	 * @param canShoot
-	 *            if the Player has ammo to shoot
-	 * @return a verified integer corresponding to a action
-	 */
 	public int pickTurn(boolean canLook, boolean canShoot) {
 		// TODO
 		// add an option for the user to save the game.
@@ -356,13 +339,6 @@ public class ConsoleUI extends UserInterface{
 		} while (true);
 	}
 
-	/**
-	 * Print out a congratulations or game over screen
-	 * 
-	 * @param victorious
-	 *            if the Player won, or AI won
-	 * @return if the player wants to restart the game
-	 */
 	public boolean printGameOver(boolean victorious) {
 		if (victorious) {
 			System.out.println("Congratulations you won!");
@@ -382,9 +358,6 @@ public class ConsoleUI extends UserInterface{
 
 	}
 
-	/**
-	 * Print if the player shot a Ninja DEAD
-	 */
 	public void printShotResult(boolean result) {
 		double dice = Math.random();
 		if (result) {
@@ -410,11 +383,6 @@ public class ConsoleUI extends UserInterface{
 		}
 	}
 
-	/**
-	 * Ask User what to save name to this File as. Path is Locked
-	 * 
-	 * @return the name user Request to Save the file As
-	 */
 	public String querySaveFileName() {
 		System.out.println("What would you like to name your Save file to?\nName: ");
 		do {
@@ -437,29 +405,14 @@ public class ConsoleUI extends UserInterface{
 		System.out.println("You can not move in that direction! Pick another Direction");
 	}
 
-	/**
-	 * Get List of Every Save File in Directory, query user, for which they wish to
-	 * use.
-	 * 
-	 * @return the file name
-	 */
 	public String queryLoadFileName() {
 		return null;
 	}
 
-	/**
-	 * Print warning message that the player lost a life, and returned to 0,0
-	 */
 	public void printDamaged() {
 		System.out.println("A Ninja got you! You are forced to retreat to the Starting Point");
 	}
 
-	/**
-	 * Print a query for the Difficulty to play the game at In Reality, define if
-	 * the AI should be enabled
-	 * 
-	 * @return the selected difficulty, where true means enable AI
-	 */
 	public boolean offerDifficulty() {
 		System.out.print("Would you like to enable the ninja AI? (Y/N)\nResponse: ");
 		String result = scanner.next(); // changed from nextLine to next
@@ -475,13 +428,6 @@ public class ConsoleUI extends UserInterface{
 		return result.equalsIgnoreCase("Y");
 	}
 
-	/**
-	 * Gets a Direction from the UI
-	 * 
-	 * @param actionType
-	 *            What is the Direction entered in reference to
-	 * @return The Direction the user specified, as a char of either n,s,w,e
-	 */
 	public char queryDirection(String actionType) {
 		System.out.print("Which direction would you like to " + actionType + " in? (N/S/E/W)\nDirection: ");
 		String result = scanner.next();// changed from nextLine to next
