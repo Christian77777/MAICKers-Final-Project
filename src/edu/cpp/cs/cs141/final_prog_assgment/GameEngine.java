@@ -172,8 +172,7 @@ public class GameEngine {
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		finally{
+		}finally{
 			runGame();
 		}
 	}

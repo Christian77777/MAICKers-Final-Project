@@ -444,7 +444,7 @@ public class ConsoleUI extends UserInterface{
 	 * @return the file name
 	 */
 	public String queryLoadFileName() {
-		System.out.println("What is the saved file's name?");
+		System.out.println("What is the saved file name?");
 		scanner.nextLine();
 		return scanner.nextLine();
 	}
