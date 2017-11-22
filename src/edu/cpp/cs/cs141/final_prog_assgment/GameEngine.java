@@ -75,6 +75,10 @@ public class GameEngine {
 	 */
 	private boolean victory;
 	/**
+	 * If the player saved this "turn"
+	 */
+	private boolean saved;
+	/**
 	 * Decides if Enemy AI is enabled
 	 */
 	private boolean hardmode;
@@ -143,9 +147,12 @@ public class GameEngine {
 		boolean playAgain;
 		do {
 			executePlayerTurn();
-			if (!victory)
+			if (!victory && !saved)
 				executeEnemyTurn();
 		} while (!gameOver);
+		if(saved) {
+			saved = false;			
+		}
 		if (victory) {
 			playAgain = ui.printGameOver(true);
 		} else {
@@ -213,6 +220,7 @@ public class GameEngine {
 			System.out.println("Oops, failed to Save File!");
 			e.printStackTrace();
 		}
+		saved = true;
 	}
 
 	/**
