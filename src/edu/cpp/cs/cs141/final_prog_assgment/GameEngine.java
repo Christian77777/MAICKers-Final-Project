@@ -108,7 +108,8 @@ public class GameEngine {
 	 * Prints Welcome to User, and decides what to do
 	 */
 	public void startGame() {
-		int mainMenuOption = ui.welcomeMessage();
+		ui.welcomeMessage();
+		int mainMenuOption = ui.printMainMenu();
 		if (mainMenuOption == 1)
 			newGame();
 		else if (mainMenuOption == 2) {

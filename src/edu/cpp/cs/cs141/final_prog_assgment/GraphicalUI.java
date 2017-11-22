@@ -137,6 +137,7 @@ public class GraphicalUI extends UserInterface {
 		mapPanel.setVisible(false);
 		System.out.println("GUI Enabled, Ignoring Console");
 		frame.setVisible(true);
+		welcomeMessage();
 		JOptionPane.showMessageDialog(null, "GUI Enabled, but Incomplete", "Incomplete Code",
 				JOptionPane.INFORMATION_MESSAGE,
 				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
@@ -145,7 +146,7 @@ public class GraphicalUI extends UserInterface {
 	@Override
 	public void welcomeMessage()
 	{
-		
+		txtArea.setText("Welcome to the game!");
 	}
 
 	@Override
