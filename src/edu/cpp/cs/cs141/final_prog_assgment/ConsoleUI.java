@@ -444,6 +444,8 @@ public class ConsoleUI extends UserInterface{
 				System.out.println("Shot in the wrong direction");
 			}
 		}
+		
+		pressEnterToContinue();
 	}
 
 	@Override
