@@ -136,17 +136,24 @@ public class GameEngine {
 	 * Runs all the Gameplay
 	 */
 	public void runGame() {
+		boolean playAgain;
 		do {
 			executePlayerTurn();
 			if (!victory)
 				executeEnemyTurn();
 		} while (!gameOver);
 		if (victory) {
-			ui.printGameOver(true);
+			playAgain = ui.printGameOver(true);
 		} else {
-			ui.printGameOver(false);
+			playAgain = ui.printGameOver(false);
 		}
-		startGame();
+		if (playAgain) {
+			newGame();
+		}
+		else {
+			System.exit(0);
+		}
+		
 	}
 
 	/**
