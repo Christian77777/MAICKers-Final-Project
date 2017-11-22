@@ -57,7 +57,7 @@ public class ConsoleUI extends UserInterface{
 		{
 			System.out.println("Starting Game");
 		}else if (input == 3) {
-			printHelp();
+			
 		}else if (input == 4) {
 			System.exit(0);
 		}
@@ -153,53 +153,53 @@ public class ConsoleUI extends UserInterface{
 	}
 
 	private void printPictures() {
-		System.out.println("\n      ¶¶\r\n" + 
-					"      ¶¶              ¶¶¶¶¶\r\n" + 
-					"      ¶¶¶            ¶¶¶¶¶¶¶\r\n" + 
-					"      ¶¶¶            ¶¶¶¶¶¶¶¶\r\n" + 
-					"     ¶¶¶¶           ¶¶-1¶¶-1¶¶\r\n" + 
-					"   ¶¶¶¶¶¶¶          ¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"   ¶¶¶¶             ¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"    ¶¶               ¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"    ¶¶             ¶¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"     ¶¶               ¶¶¶¶¶¶¶\r\n" + 
-					"     ¶¶          ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"     ¶¶¶       ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"     ¶¶¶   ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"      ¶¶¶¶¶¶¶¶¶¶¶  ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶\r\n" + 
-					"      ¶¶¶¶¶¶¶¶    ¶¶¶¶¶¶¶¶¶¶¶¶¶   ¶¶¶¶\r\n" + 
-					"                  ¶¶¶¶¶¶¶¶¶¶¶¶¶    ¶¶¶¶\r\n" + 
-					"                   ¶¶¶¶¶¶¶¶¶¶¶      ¶¶¶¶\r\n" + 
-					"                    ¶¶¶¶¶¶¶¶¶¶       ¶¶¶\r\n" + 
-					"                   ¶¶¶¶¶¶¶¶¶¶         ¶¶¶\r\n" + 
-					"                  ¶¶¶¶¶¶¶¶¶¶¶         ¶¶¶\r\n" + 
-					"                 ¶¶¶¶¶¶¶¶¶¶¶¶          ¶¶\r\n" + 
-					"                ¶¶¶¶¶¶¶¶¶¶¶¶¶          ¶¶\r\n" + 
-					"               ¶¶¶¶¶¶¶¶¶¶¶¶¶¶           ¶¶\r\n" + 
-					"              ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶           ¶¶\r\n" + 
-					"             ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶           ¶¶¶\r\n" + 
-					"            ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶           ¶ ¶¶\r\n" + 
-					"            ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶           ¶¶\r\n" + 
-					"           ¶¶¶¶¶¶¶¶    ¶¶¶¶¶¶¶¶\r\n" + 
-					"           ¶¶¶¶¶¶¶      ¶¶¶¶¶¶¶¶\r\n" + 
-					"          ¶¶¶¶¶¶¶        ¶¶¶¶¶¶¶\r\n" + 
-					"          ¶¶¶¶¶¶          ¶¶¶¶¶¶¶\r\n" + 
-					"         ¶¶¶¶¶¶            ¶¶¶¶¶¶\r\n" + 
-					"         ¶¶¶¶¶              ¶¶¶¶¶¶\r\n" + 
-					"        ¶¶¶¶¶                ¶¶¶¶¶¶\r\n" + 
-					"       ¶¶¶¶¶                  ¶¶¶¶¶¶\r\n" + 
-					"      ¶¶¶¶¶                     ¶¶¶¶¶¶\r\n" + 
-					"     ¶¶¶¶¶                       ¶¶¶¶¶¶\r\n" + 
-					"     ¶¶¶¶¶                        ¶¶¶¶¶¶\r\n" + 
-					"    ¶¶¶¶¶                          ¶¶¶¶¶¶\r\n" + 
-					"    ¶¶¶¶                            ¶¶¶¶¶¶\r\n" + 
-					"   ¶¶¶¶                               ¶¶¶¶\r\n" + 
-					"   ¶¶¶                                 ¶¶¶¶\r\n" + 
-					"   ¶¶¶                                  ¶¶¶\r\n" + 
-					"  ¶¶¶¶                                   ¶¶¶\r\n" + 
-					" ¶¶¶ ¶                                  ¶¶¶¶\r\n" + 
-					"¶¶¶¶ ¶                                 ¶¶¶ ¶\r\n" + 
-					"                                      ¶¶¶¶ ¶");
+		System.out.println("\n      \u00B6\u00B6\r\n" + 
+					"      \u00B6\u00B6              \u00B6\u00b6\u00B6\u00B6\u00B6\r\n" + 
+					"      \u00B6\u00B6\u00B6            \u00B6\u00B6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"      \u00B6\u00B6\u00B6            \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00B6\u00B6\u00B6\u00B6           \u00B6\u00B6-1\u00B6\u00B6-1\u00B6\u00B6\r\n" + 
+					"   \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"   \u00b6\u00b6\u00b6\u00b6             \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"    \u00b6\u00b6               \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"    \u00b6\u00b6             \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6               \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6\u00b6       \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6\u00b6   \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"      \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6  \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"      \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6    \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6   \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"                  \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6    \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"                   \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6      \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"                    \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6       \u00b6\u00b6\u00b6\r\n" + 
+					"                   \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6         \u00b6\u00b6\u00b6\r\n" + 
+					"                  \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6         \u00b6\u00b6\u00b6\r\n" + 
+					"                 \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6          \u00b6\u00b6\r\n" + 
+					"                \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6          \u00b6\u00b6\r\n" + 
+					"               \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6           \u00b6\u00b6\r\n" + 
+					"              \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6           \u00b6\u00b6\r\n" + 
+					"             \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6           \u00b6\u00b6\u00b6\r\n" + 
+					"            \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6           \u00b6 \u00b6\u00b6\r\n" + 
+					"            \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6           \u00b6\u00b6\r\n" + 
+					"           \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6    \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"           \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6      \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6        \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"         \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6            \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"         \u00b6\u00b6\u00b6\u00b6\u00b6              \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"        \u00b6\u00b6\u00b6\u00b6\u00b6                \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"       \u00b6\u00b6\u00b6\u00b6\u00b6                  \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"      \u00b6\u00b6\u00b6\u00b6\u00b6                     \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6\u00b6\u00b6\u00b6                       \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"     \u00b6\u00b6\u00b6\u00b6\u00b6                        \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"    \u00b6\u00b6\u00b6\u00b6\u00b6                          \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"    \u00b6\u00b6\u00b6\u00b6                            \u00b6\u00b6\u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"   \u00b6\u00b6\u00b6\u00b6                               \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"   \u00b6\u00b6\u00b6\u00b6                                \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"   \u00b6\u00b6\u00b6                                  \u00b6\u00b6\u00b6\r\n" + 
+					"  \u00b6\u00b6\u00b6\u00b6                                   \u00b6\u00b6\u00b6\r\n" + 
+					" \u00b6\u00b6\u00b6 \u00b6                                  \u00b6\u00b6\u00b6\u00b6\r\n" + 
+					"\u00b6\u00b6\u00b6\u00b6 \u00b6                                 \u00b6\u00b6\u00b6 \u00b6\r\n" + 
+					"                                      \u00b6\u00b6\u00b6\u00b6 \u00b6");
 			System.out.println("111111¶11111111111111111111111111111111111111 \r\n" + 
 					"111111¶11111111111111111111111111111111111111\r\n" + 
 					"11111 ¶¶1111111111111111111111111111111111111\r\n" + 
@@ -269,15 +269,15 @@ public class ConsoleUI extends UserInterface{
 					+ "\n\t\t *Please note that rooms can only be entered from the top, no other "
 					+ "\n\t\t direction will allow you into the room to check for a breifcase.\n\t See the board"
 					+ " layout below for reference. You start each new game in the bottom\n\t\t left corner as shown.");
-		System.out.print("\n\t\t\t\t[•][•][•][•][•][•][•][•][•]\r" + 
-						"\n\t\t\t\t[•][#][•][•][#][•][•][#][•]\r" + 
-						"\n\t\t\t\t[•][•][•][•][•][•][•][•][•]\r" + 
-						"\n\t\t\t\t[•][•][•][•][•][•][•][•][•]\r" + 
-						"\n\t\t\t\t[•][#][•][•][#][•][•][#][•]\r" + 
-						"\n\t\t\t\t[•][•][•][•][•][•][•][•][•]\r" + 
-						"\n\t\t\t\t[•][•][•][•][•][•][•][•][•]\r" + 
-						"\n\t\t\t\t[•][#][•][•][#][•][•][#][•]\r" + 
-						"\n\t\t\t\t[P][•][•][•][•][•][•][•][•]");
+		System.out.print("\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][#][\u2022][\u2022][#][\u2022][\u2022][#][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][#][\u2022][\u2022][#][\u2022][\u2022][#][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
+						"\n\t\t\t\t[\u2022][#][\u2022][\u2022][#][\u2022][\u2022][#][\u2022]\r" + 
+						"\n\t\t\t\t[P][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]");
 		}	
 	
 	private void printStartMenu() {
@@ -444,7 +444,9 @@ public class ConsoleUI extends UserInterface{
 	 * @return the file name
 	 */
 	public String queryLoadFileName() {
-		return null;
+		System.out.println("What is the saved file name?");
+		scanner.nextLine();
+		return scanner.nextLine();
 	}
 
 	/**
