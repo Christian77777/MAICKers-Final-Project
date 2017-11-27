@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -134,6 +136,26 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel.setBorder(null);
 		pickTurnPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow][grow]", "[][]"));
 		JLabel lblPickTurn = new JLabel("What Action do you WIsh to take");
+		lblPickTurn.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				pickTurnOption = -1;
+				latch.countDown();
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) { }
+
+			@Override
+			public void mouseReleased(MouseEvent e) { }
+
+			@Override
+			public void mouseEntered(MouseEvent e) { }
+
+			@Override
+			public void mouseExited(MouseEvent e) { }
+		});
 		pickTurnPanel.add(lblPickTurn, "flowy,cell 0 0 5 1,alignx center", -1);
 		JButton btnMove = new JButton("Move");
 		btnMove.addActionListener(new ActionListener()
@@ -772,7 +794,7 @@ public class GraphicalUI extends UserInterface
                 		break;
 	            case '\u2022': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/fog.png");//http://moziru.com/images/drawn-fog-1.png
                 		break;
-	            case '\u0000': path = "";
+	            case '\u0000': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/whiteSquare.jpg");//https://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=65691568
                 		break;
 	            default:  throw new IllegalArgumentException();
 				}
