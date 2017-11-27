@@ -69,9 +69,6 @@ public class ConsoleUI extends UserInterface{
 		clearScreen();
 		return input;
 	}
-
-	
-	
 	
 	@Override
 	public void printHelp() {
@@ -454,11 +451,7 @@ public class ConsoleUI extends UserInterface{
 		do {
 			String result = scanner.nextLine();
 			try {
-				// TODO verify that entered Strings are acceptable in File Name (does this
-				// actually work?)
-				// sysout only to see the result, not to be reprinted
-				// must pass in save directory
-				System.out.println(Paths.get("dir" + File.separator + result + ".ser"));
+				System.out.println("Saving to: " + Paths.get(GameEngine.getSavePath() + File.separator + result + ".ser"));
 				return result;
 			} catch (InvalidPathException p) {
 

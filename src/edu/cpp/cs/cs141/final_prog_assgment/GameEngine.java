@@ -118,7 +118,14 @@ public class GameEngine {
 			newGame();
 		else if (mainMenuOption == 2) {
 			String x = ui.queryLoadFileName(new File(savePath).list());
-			loadGame(x);
+			if(x != null)
+			{
+				loadGame(x);
+			}
+			else
+			{
+				newGame();
+			}
 		}
 		else if (mainMenuOption == 3)
 			help();		
@@ -217,7 +224,7 @@ public class GameEngine {
 			oos.writeObject(board);
 			out.close();
 		} catch (IOException e) {
-			System.out.println("Oops, failed to Save File!");
+			System.out.println("Oops, failed to Save File!");//TODO UI in GameEngine!
 			e.printStackTrace();
 		}
 		saved = true;
@@ -666,4 +673,8 @@ public class GameEngine {
 		board = game.getMapData();
 	}
 	
+	public static String getSavePath()
+	{
+		return savePath;
+	}
 }
