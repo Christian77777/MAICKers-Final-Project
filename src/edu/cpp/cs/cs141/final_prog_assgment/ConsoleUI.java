@@ -175,7 +175,18 @@ public class ConsoleUI extends UserInterface{
 	}
 
 	private void printLoadGame() {
-		System.out.print("\nLoading a Previous Game\n\t...");
+		System.out.print("\nLoading a Previous Game\n\t"
+				+ "When loading a previous game, a list of all your saved games will appear. In order"
+				+ "\n\tto select a saved game, simply enter in the corresponding number. Once you've done"
+				+ "\n\tso, the game will load from the point at which you have saved it. Your location"
+				+ "\n\talong with the location of the briefcase, ninjas and power-ups will be reloaded"
+				+ "\n\tand ready to go. You'll be prompted from that point on with your choices available"
+				+ "\n\tto you at every move and you may continue that game like you never left it."
+				+ "\n\tA sample prompy of that this may look like is:"
+				+ "\n\t\tWhich Save file do you wish to load?\r\n" + 
+				"\n\t\t	1. - I'm almost winning!\r\n" + 
+				"\n\t\t	2. - I'm done for\r\n" + 
+				"\n\t\tSave File: ");
 	}
 
 	private void printPicture(boolean first) {
@@ -293,10 +304,10 @@ public class ConsoleUI extends UserInterface{
 					+ "\n\t Luckily for you, since you have a flashlight, you may chose to look in one "
 					+ "\n\t direction and see two spaces in that direction."
 					+ "\n\t To win the game you must move your Spy player aroard safely and check each room,"
-					+ "\n\t indicated by the [#] symbol, for the briefcase. Once youve found the correct room" 
+					+ "\n\t indicated by the [#] symbol, for the briefcase. Once you've found the correct room" 
 					+ "\n\t with the briefcase, congratulations! You have won the game."
 					+ "\n\t\t *Please note that rooms can only be entered from the top, no other "
-					+ "\n\t\t direction will allow you into the room to check for a breifcase.\n\t See the board"
+					+ "\n\t\t direction will allow you into the room to check for a briefcase.\n\t See the board"
 					+ " layout below for reference. You start each new game in the bottom\n\t\t left corner as shown.");
 		System.out.print("\n\t\t\t\t[\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022][\u2022]\r" + 
 						"\n\t\t\t\t[\u2022][#][\u2022][\u2022][#][\u2022][\u2022][#][\u2022]\r" + 
@@ -315,7 +326,7 @@ public class ConsoleUI extends UserInterface{
 				"\t\t\t Upon starting a new game you will be given the choice if you"+
 				"\n\t\t\t 'would like to enable the ninja AI'. Enter Y for yes and N for"+
 				"\n\t\t\t no. If you are unsure what AI means, This is simply asking if"+
-				"\n\t\t\t you would like to give the game an extra challange by allowing" +
+				"\n\t\t\t you would like to give the game an extra challenge by allowing" +
 				"\n\t\t\t the ninjas to see where you are and move in your direction" +
 				"\n\t\t\t verses moving randomly.");
 		System.out.print("\n\t\t 2. Load Game\n\t\t\t Loading a game will allow you to reload a game that you have"+
