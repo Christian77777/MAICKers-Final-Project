@@ -16,8 +16,7 @@
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -32,19 +31,20 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -56,13 +56,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
-
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.SwingConstants;
 
 /**
  * This Class is the Implementation of the Option GUI Interface for the Program
@@ -274,7 +268,6 @@ public class GraphicalUI extends UserInterface {
 		for (int x = 0; x < 9; x++) {
 			for (int y = 0; y < 9; y++) {
 				Labelmap[x][y] = new JLabel(icons[0]);
-				Labelmap[x][y].setIcon(icons[0]);
 				mapPanel.add(Labelmap[x][y]);
 				oldmap[x][y] = 'u';
 			}
@@ -288,41 +281,39 @@ public class GraphicalUI extends UserInterface {
 		mntmChangeImageResolution = new JMenuItem("Change Image Resolution");
 		mntmChangeImageResolution.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SpinnerModel model = new SpinnerNumberModel(20, 10, 100, 10);
-				JSpinner counter = new JSpinner(model);
-				//Not happening
-				int selection = JOptionPane.showOptionDialog(frame, "What Resolution for a single Image is best for your Image\nA Good Range is (30 - 80)", "Choose Resolution", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] {counter}, null);//Better for using JComponents
-				System.out.println(selection);
+				ResolutionQueryDialog dialog = new ResolutionQueryDialog(frame);
+				dialog.pack();
+				dialog.setLocationRelativeTo(frame);
+				dialog.setVisible(true);// Blocks until Option made
+				setMapImageSize(dialog.getPixels());
+				resetMap();
 			}
 		});
 		menuBar.add(mntmChangeImageResolution);
 
 		mntmOpenFolder = new JMenuItem("Open Folder");
+		mntmOpenFolder.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					Desktop.getDesktop().open(new File(GameEngine.getSavePath()));
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+					System.exit(1);
+				}
+			}
+		});
 		menuBar.add(mntmOpenFolder);
 
 		chckbxmntmMuteMusic = new JCheckBoxMenuItem("Mute Music");
 		menuBar.add(chckbxmntmMuteMusic);
-
-		frame.addComponentListener(new ComponentListener() {
-
-			@Override
-			public void componentShown(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentResized(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
-		});
+		
 		System.out.println("JFrame Constructed");
-		frame.setVisible(true);
 		scheduler = new Timer(1000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -335,6 +326,7 @@ public class GraphicalUI extends UserInterface {
 				}
 			}
 		});
+		frame.setVisible(true);
 		scheduler.start();
 		welcomeMessage();
 	}
@@ -657,6 +649,96 @@ public class GraphicalUI extends UserInterface {
 		}
 		txtArea.setText(message);
 	}
+	
+	class ResolutionQueryDialog extends JDialog {
+
+		/**
+		 * ID of this version of the Dialog
+		 */
+		private static final long serialVersionUID = -6671398648403711561L;
+
+		/**
+		 * JSpinner where the User inputs the Pixel Count
+		 */
+		private JSpinner pixelField;
+
+		/**
+		 * Points to int in JSpinner
+		 */
+		private int enteredpixels;
+
+		/**
+		 * Internal Panel inside JDialog
+		 */
+		private JOptionPane optionPane;
+
+		/**
+		 * JButton to Confirm User finished entering Resolution
+		 */
+		private JButton btn1 = new JButton("Verify");
+
+		/**
+		 * @return the verified Pixel count
+		 */
+		public int getPixels() {
+			return enteredpixels;
+		}
+
+		/** Creates the reusable dialog. */
+		public ResolutionQueryDialog(JFrame window) {
+			super(window, true);
+			setTitle("Resolution Size Query");
+
+			pixelField = new JSpinner(new SpinnerNumberModel(20, 10, 100, 10));
+
+			String msgString1 = "What length do you want the Map Tokens to be?\nEnter Size in pixel count, range from (10-100)";
+			Object[] array = { msgString1, pixelField };
+
+			btn1.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					btn1.setEnabled(false);
+					boolean saveable = false;
+					try {
+						enteredpixels = (int)pixelField.getValue();
+						saveable = true;
+					} catch (ClassCastException e) {
+
+					}
+					if (saveable) {
+						setVisible(false);
+					} else {
+						JOptionPane.showMessageDialog(ResolutionQueryDialog.this,
+								"Number Invalid", "Bad Input",
+								JOptionPane.ERROR_MESSAGE);
+						pixelField.requestFocusInWindow();
+						btn1.setEnabled(true);
+					}
+				}
+
+			});
+			;
+			Object[] options = { btn1 };
+
+			optionPane = new JOptionPane(array, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options,
+					options[0]);
+			setContentPane(optionPane);
+
+			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent we) {
+					setVisible(false);
+				}
+			});
+
+			addComponentListener(new ComponentAdapter() {
+				public void componentShown(ComponentEvent ce) {
+					pixelField.requestFocusInWindow();
+				}
+			});
+		}
+	}
 
 	class FileNameQueryDialog extends JDialog {
 
@@ -686,9 +768,9 @@ public class GraphicalUI extends UserInterface {
 		private JButton btn1 = new JButton("Verify");
 
 		/**
-		 * @return the verified Username
+		 * @return the verified Filename
 		 */
-		public String getUsername() {
+		public String getFilename() {
 			return enteredFileName;
 		}
 
@@ -758,7 +840,7 @@ public class GraphicalUI extends UserInterface {
 		dialog.pack();
 		dialog.setLocationRelativeTo(frame);
 		dialog.setVisible(true);// Blocks until Option made
-		return dialog.getUsername();
+		return dialog.getFilename();
 	}
 
 	@Override
