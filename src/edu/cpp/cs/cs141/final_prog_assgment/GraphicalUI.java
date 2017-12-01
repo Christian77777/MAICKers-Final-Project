@@ -23,12 +23,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -73,8 +76,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This Class is the Implementation of the Option GUI Interface for the Program
  */
-public class GraphicalUI extends UserInterface
-{
+public class GraphicalUI extends UserInterface {
 	private JFrame frame;
 	private JPanel mapPanel;
 	private JPanel menuPanel;
@@ -98,14 +100,19 @@ public class GraphicalUI extends UserInterface
 	 * Effect only for GUI
 	 */
 	private Timer scheduler;
+	/**
+	 * 0 = Main Menu 1 = Pick Turn 2 = Direction Pick
+	 */
+	private volatile int mode = 0;
 	private JMenuBar menuBar;
 	private JCheckBoxMenuItem chckbxmntmMuteMusic;
 	private JMenuItem mntmOpenFolder;
 	private JMenuItem mntmChangeImageResolution;
 	private AudioInputStream audioStream;
+	private boolean canShoot;
+	private boolean canLook;
 
-	public GraphicalUI()
-	{
+	public GraphicalUI() {
 		System.out.println("GUI Enabled, Ignoring Console");
 		fetchBaseIcons();
 		frame = new JFrame("Spy Game");
@@ -139,17 +146,14 @@ public class GraphicalUI extends UserInterface
 		frame.setJMenuBar(menuBar);
 
 		mntmChangeImageResolution = new JMenuItem("Change Image Resolution");
-		mntmChangeImageResolution.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		mntmChangeImageResolution.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				ResolutionQueryDialog dialog = new ResolutionQueryDialog(frame);
 				dialog.pack();
 				dialog.setLocationRelativeTo(frame);
 				dialog.setVisible(true);// Blocks until Option made
 				pixelCount = dialog.getPixels();
-				if (pixelCount > 0)
-				{
+				if (pixelCount > 0) {
 					setMapImageSize(dialog.getPixels());
 					reloadMap();
 				}
@@ -158,18 +162,13 @@ public class GraphicalUI extends UserInterface
 		menuBar.add(mntmChangeImageResolution);
 
 		mntmOpenFolder = new JMenuItem("Open Folder");
-		mntmOpenFolder.addActionListener(new ActionListener()
-		{
+		mntmOpenFolder.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
+			public void actionPerformed(ActionEvent e) {
+				try {
 					new File(GameEngine.getSavePath()).mkdirs();
 					Desktop.getDesktop().open(new File(GameEngine.getSavePath()));
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 					e1.printStackTrace();
 					System.exit(1);
 				}
@@ -178,34 +177,58 @@ public class GraphicalUI extends UserInterface
 		menuBar.add(mntmOpenFolder);
 
 		chckbxmntmMuteMusic = new JCheckBoxMenuItem("Mute Music");
-		chckbxmntmMuteMusic.addActionListener(new ActionListener()
-		{
+		chckbxmntmMuteMusic.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (chckbxmntmMuteMusic.isSelected())
-				{
+			public void actionPerformed(ActionEvent e) {
+				if (chckbxmntmMuteMusic.isSelected()) {
 					soundLine.stop();
-				}
-				else
-				{
+				} else {
 					soundLine.start();
 				}
 			}
 		});
 		menuBar.add(chckbxmntmMuteMusic);
 
-		scheduler = new Timer(1000, new ActionListener()
-		{
+		scheduler = new Timer(1000, new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				Random random = new Random();
 				Labelmap[random.nextInt(9)][random.nextInt(9)].setIcon(icons[random.nextInt(9)]);
 				// Java default char value is equal to "Blank Space" keyword,
 				// but because it will never affect the old map incorrectly as
 				// looking
 
+			}
+		});
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_LEFT && mode == 2) {
+					pickDirectionOption = 'w';
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_RIGHT && mode == 2) {
+					pickDirectionOption = 'e';
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_UP && mode == 2) {
+					pickDirectionOption = 'n';
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_DOWN && mode == 2) {
+					pickDirectionOption = 's';
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_Q && mode == 1) {
+					pickTurnOption = 1;
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_W && mode == 1 && canLook) {
+					pickTurnOption = 2;
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_E && mode == 1 && canShoot) {
+					pickTurnOption = 3;
+					latch.countDown();
+				} else if (e.getKeyCode() == KeyEvent.VK_R && mode == 1) {
+					pickTurnOption = 4;
+					latch.countDown();
+				}
+				return false;
 			}
 		});
 		System.out.println("JFrame Constructed");
@@ -215,71 +238,52 @@ public class GraphicalUI extends UserInterface
 		welcomeMessage();
 	}
 
-	private void setupAudio()
-	{
-		try
-		{
-			audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(GraphicalUI.class.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
+	private void setupAudio() {
+		try {
+			audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(
+					GraphicalUI.class.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
 			AudioFormat format = audioStream.getFormat();
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-			if (AudioSystem.isLineSupported(info))
-			{
+			if (AudioSystem.isLineSupported(info)) {
 				soundLine = (SourceDataLine) AudioSystem.getLine(info);
 				soundLine.open(format);
 				soundLine.start();
-				Thread thread = new Thread(new Runnable()
-				{
+				Thread thread = new Thread(new Runnable() {
 					@Override
-					public void run()
-					{
+					public void run() {
 						boolean functioning = true;
-						do
-						{
-							try
-							{
-								audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(GraphicalUI.class.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
+						do {
+							try {
+								audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(GraphicalUI.class
+										.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
 								byte[] bytesBuffer = new byte[50];
-					            int bytesRead = -1;
+								int bytesRead = -1;
 								while ((bytesRead = audioStream.read(bytesBuffer)) != -1) {
-					                soundLine.write(bytesBuffer, 0, bytesRead);
-					            }
+									soundLine.write(bytesBuffer, 0, bytesRead);
+								}
 								soundLine.drain();
-								
-							}
-							catch (IOException | UnsupportedAudioFileException e)
-							{
+
+							} catch (IOException | UnsupportedAudioFileException e) {
 								e.printStackTrace();
 								functioning = false;
-							}
-							finally
-							{
-								try
-								{
+							} finally {
+								try {
 									audioStream.close();
-								}
-								catch (IOException e)
-								{
+								} catch (IOException e) {
 									e.printStackTrace();
 								}
 							}
 
-						}
-						while (functioning);
+						} while (functioning);
 					}
 				});
 				thread.start();
 			}
-		}
-		catch (UnsupportedAudioFileException e)
-		{
+		} catch (UnsupportedAudioFileException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		catch (LineUnavailableException e1)
-		{
+		} catch (LineUnavailableException e1) {
 			e1.printStackTrace();
 		}
 	}
@@ -288,8 +292,7 @@ public class GraphicalUI extends UserInterface
 	 * Sets the base Image Icons in Memory. to be resized when used in the
 	 * {@link #mapPanel}.
 	 */
-	private void fetchBaseIcons()
-	{
+	private void fetchBaseIcons() {
 		baseIcons[0] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/spy.png"));
 		baseIcons[1] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/ninja.png"));
 		baseIcons[2] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/bullet.jpg"));
@@ -302,19 +305,16 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Creates the JPanel that contains the 9x9 Map. This does NOT Add the Panel
-	 * to the JFrame
+	 * Creates the JPanel that contains the 9x9 Map. This does NOT Add the Panel to
+	 * the JFrame
 	 */
-	private void createMapPanel()
-	{
+	private void createMapPanel() {
 		mapPanel = new JPanel();
 		mapPanel.setBorder(new LineBorder(new Color(0, 0, 0), 4, true));
 		GridLayout panelConstraints = new GridLayout(9, 9);
 		mapPanel.setLayout(panelConstraints);
-		for (int x = 0; x < 9; x++)
-		{
-			for (int y = 0; y < 9; y++)
-			{
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
 				Labelmap[x][y] = new JLabel(icons[8]);
 				mapPanel.add(Labelmap[x][y]);
 			}
@@ -322,11 +322,10 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Creates the JPanel that contains the 4 option Main Menu. This does NOT
-	 * Add the Panel to the JFrame
+	 * Creates the JPanel that contains the 4 option Main Menu. This does NOT Add
+	 * the Panel to the JFrame
 	 */
-	private void createMenuPanel()
-	{
+	private void createMenuPanel() {
 		menuPanel = new JPanel();
 		menuPanel.setBorder(null);
 		menuPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow]", "[][]"));
@@ -334,10 +333,8 @@ public class GraphicalUI extends UserInterface
 		JLabel lblMainMenu = new JLabel("Main Menu");
 		menuPanel.add(lblMainMenu, "flowy,cell 0 0 4 1,alignx center");
 		JButton btnNewGame = new JButton("New Game");
-		btnNewGame.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnNewGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				scheduler.stop();
 				menuOption = 1;
 				latch.countDown();
@@ -345,10 +342,8 @@ public class GraphicalUI extends UserInterface
 		});
 		menuPanel.add(btnNewGame, "cell 0 1,growx");
 		JButton btnLoadGame = new JButton("Load Game");
-		btnLoadGame.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnLoadGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				scheduler.stop();
 				menuOption = 2;
 				latch.countDown();
@@ -356,20 +351,16 @@ public class GraphicalUI extends UserInterface
 		});
 		menuPanel.add(btnLoadGame, "cell 1 1,growx");
 		JButton btnHelp = new JButton("Help");
-		btnHelp.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				menuOption = 3;
 				latch.countDown();
 			}
 		});
 		menuPanel.add(btnHelp, "cell 2 1,growx");
 		JButton btnQuit = new JButton("Quit");
-		btnQuit.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				menuOption = 4;
 				latch.countDown();
 			}
@@ -378,37 +369,31 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Creates the JPanel that presents the Player with 3 moves, save option,
-	 * and Quit option. This does NOT Add the Panel to the JFrame.
+	 * Creates the JPanel that presents the Player with 3 moves, save option, and
+	 * Quit option. This does NOT Add the Panel to the JFrame.
 	 */
-	private void createPickTurnPanel()
-	{
+	private void createPickTurnPanel() {
 		pickTurnPanel = new JPanel();
 		pickTurnPanel.setBorder(null);
 		pickTurnPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow][grow]", "[][]"));
 		JLabel lblPickTurn = new JLabel("What Action do you Wish to take");
-		lblPickTurn.addMouseListener(new MouseAdapter()
-		{
+		lblPickTurn.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e)
-			{
+			public void mouseClicked(MouseEvent e) {
 				pickTurnOption = -1;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(lblPickTurn, "flowy,cell 0 0 5 1,alignx center", -1);
-		JButton btnMove = new JButton("Move")
-		{
+		JButton btnMove = new JButton("Move (Q)") {
 			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void paintComponent(Graphics g)
-			{
-				if (this.isEnabled())
-				{
+			protected void paintComponent(Graphics g) {
+				if (this.isEnabled()) {
 					Graphics2D g2 = (Graphics2D) g.create();
 					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
 							Color.WHITE));
@@ -423,27 +408,22 @@ public class GraphicalUI extends UserInterface
 		};
 		btnMove.setContentAreaFilled(false);
 		btnMove.setBackground(new Color(150, 255, 150));
-		btnMove.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnMove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 1;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnMove, "cell 0 1,growx", -1);
-		JButton btnLook = new JButton("Look")
-		{
+		JButton btnLook = new JButton("Look (W)") {
 			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 2856717422567232857L;
 
 			@Override
-			protected void paintComponent(Graphics g)
-			{
-				if (this.isEnabled())
-				{
+			protected void paintComponent(Graphics g) {
+				if (this.isEnabled()) {
 					Graphics2D g2 = (Graphics2D) g.create();
 					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
 							Color.WHITE));
@@ -458,17 +438,14 @@ public class GraphicalUI extends UserInterface
 		};
 		btnLook.setContentAreaFilled(false);
 		btnLook.setBackground(new Color(255, 255, 100));
-		btnLook.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnLook.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 2;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnLook, "cell 1 1,growx", -1);
-		JButton btnShoot = new JButton("Shoot")
-		{
+		JButton btnShoot = new JButton("Shoot (E)") {
 
 			/**
 			 * 
@@ -476,10 +453,8 @@ public class GraphicalUI extends UserInterface
 			private static final long serialVersionUID = 4429422460496975540L;
 
 			@Override
-			protected void paintComponent(Graphics g)
-			{
-				if (this.isEnabled())
-				{
+			protected void paintComponent(Graphics g) {
+				if (this.isEnabled()) {
 					Graphics2D g2 = (Graphics2D) g.create();
 					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
 							Color.WHITE));
@@ -494,37 +469,30 @@ public class GraphicalUI extends UserInterface
 		};
 		btnShoot.setContentAreaFilled(false);
 		btnShoot.setBackground(new Color(255, 200, 100));
-		btnShoot.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnShoot.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 3;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnShoot, "cell 2 1,growx", -1);
-		JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		JButton btnSave = new JButton("Save (R)");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 4;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnSave, "cell 3 1,growx", -1);
-		JButton btnQuit2 = new JButton("Quit")
-		{
+		JButton btnQuit2 = new JButton("Quit") {
 			/**
 			 * 
 			 */
 			private static final long serialVersionUID = -3223908660254407736L;
 
 			@Override
-			protected void paintComponent(Graphics g)
-			{
-				if (this.isEnabled())
-				{
+			protected void paintComponent(Graphics g) {
+				if (this.isEnabled()) {
 					Graphics2D g2 = (Graphics2D) g.create();
 					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
 							Color.WHITE));
@@ -539,10 +507,8 @@ public class GraphicalUI extends UserInterface
 		};
 		btnQuit2.setContentAreaFilled(false);
 		btnQuit2.setBackground(new Color(255, 150, 150));
-		btnQuit2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnQuit2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 5;
 				latch.countDown();
 			}
@@ -551,51 +517,42 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Creates the JPanel that presents the User with 4 Directions. This does
-	 * NOT Add the Panel to the JFrame
+	 * Creates the JPanel that presents the User with 4 Directions. This does NOT
+	 * Add the Panel to the JFrame
 	 */
-	private void createDirectionPanel()
-	{
+	private void createDirectionPanel() {
 		pickDirectionPanel = new JPanel();
 		pickDirectionPanel.setBorder(null);
 		pickDirectionPanel.setLayout(new MigLayout("", "[grow][grow][grow]", "[][][]"));
 		JLabel lblPickDirection = new JLabel("Which Direction?");
 		pickDirectionPanel.add(lblPickDirection, "flowy,cell 1 1,alignx center", -1);
-		JButton btnNorth = new JButton("North");
-		btnNorth.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		JButton btnNorth = new JButton("North (arrowUp)");
+		btnNorth.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'n';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnNorth, "cell 1 0,growx", -1);
-		JButton btnEast = new JButton("East");
-		btnEast.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		JButton btnEast = new JButton("East (arrowRight)");
+		btnEast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'e';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnEast, "cell 2 1,growx", -1);
-		JButton btnSouth = new JButton("South");
-		btnSouth.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		JButton btnSouth = new JButton("South (arrowDown)");
+		btnSouth.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 's';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnSouth, "cell 1 2,growx", -1);
-		JButton btnWest = new JButton("West");
-		btnWest.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		JButton btnWest = new JButton("West (arrowLeft)");
+		btnWest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'w';
 				latch.countDown();
 			}
@@ -604,14 +561,13 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Changes all of the cached Images of the Tokens to a Specified Size.
-	 * Requires {@link #reloadMap()} to see Changes
+	 * Changes all of the cached Images of the Tokens to a Specified Size. Requires
+	 * {@link #reloadMap()} to see Changes
 	 * 
 	 * @param size
 	 *            The horizontal pixel size of a single token
 	 */
-	private void setMapImageSize(int size)
-	{
+	private void setMapImageSize(int size) {
 		icons[0] = new ImageIcon(baseIcons[0].getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
 		icons[1] = new ImageIcon(baseIcons[1].getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
 		icons[2] = new ImageIcon(baseIcons[2].getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
@@ -628,17 +584,12 @@ public class GraphicalUI extends UserInterface
 	 * Updates all JLabels on the Map, likely used in changing the size, doesn't
 	 * swap any Images
 	 */
-	private void reloadMap()
-	{
-		if (mapPanel.isVisible())
-		{
+	private void reloadMap() {
+		if (mapPanel.isVisible()) {
 			mapPanel.setSize(mapPanel.getHeight(), mapPanel.getHeight());
-			for (int x = 0; x < 9; x++)
-			{
-				for (int y = 0; y < 9; y++)
-				{
-					switch (oldmap[x][y])
-					{
+			for (int x = 0; x < 9; x++) {
+				for (int y = 0; y < 9; y++) {
+					switch (oldmap[x][y]) {
 					case 'P':
 						Labelmap[x][y].setIcon(icons[0]);// ?
 						break;
@@ -675,22 +626,17 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void welcomeMessage()
-	{
+	public void welcomeMessage() {
 		txtArea.setText("Welcome to the game!");
 	}
 
 	@Override
-	public int printMainMenu()
-	{
-		try
-		{
-			EventQueue.invokeAndWait(new Runnable()
-			{
+	public int printMainMenu() {
+		try {
+			EventQueue.invokeAndWait(new Runnable() {
 
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(menuPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Main Menu Option");
 					frame.validate();
@@ -698,18 +644,14 @@ public class GraphicalUI extends UserInterface
 			});
 			latch = new CountDownLatch(1);
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(menuPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e1)
-		{
+		} catch (InvocationTargetException | InterruptedException e1) {
 			e1.printStackTrace();
 			System.exit(1);
 		}
@@ -717,10 +659,8 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printHelp()
-	{
-		try
-		{
+	public void printHelp() {
+		try {
 			String[] messages = new String[6];
 			messages[0] = new String(
 					"\n\t The object of the game is to move your Spy character around the 9 by 9 grid board"
@@ -810,19 +750,14 @@ public class GraphicalUI extends UserInterface
 			txtArea.setText(messages[0]);
 			pageNumber = 0;
 			JButton continueHelp = new JButton("Next Page");
-			continueHelp.addActionListener(new ActionListener()
-			{
+			continueHelp.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e)
-				{
+				public void actionPerformed(ActionEvent e) {
 					pageNumber++;
-					if (pageNumber <= 5)
-					{
+					if (pageNumber <= 5) {
 						txtArea.setText(messages[pageNumber]);
-					}
-					else
-					{
+					} else {
 						frame.getContentPane().remove(continueHelp);
 						frame.validate();
 						txtArea.setText("");
@@ -831,11 +766,9 @@ public class GraphicalUI extends UserInterface
 				}
 
 			});
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(continueHelp, "cell 0 2,grow");
 					frame.validate();
 				}
@@ -843,65 +776,53 @@ public class GraphicalUI extends UserInterface
 			latch = new CountDownLatch(1);
 			latch.await();
 			pageNumber = 0;
-		}
-		catch (InvocationTargetException | InterruptedException e1)
-		{
+		} catch (InvocationTargetException | InterruptedException e1) {
 			e1.printStackTrace();
 			System.exit(1);
 		}
 	}
 
 	@Override
-	public int pickTurn(boolean canLook, boolean canShoot)
-	{
-		try
-		{
+	public int pickTurn(boolean canLook, boolean canShoot) {
+		try {
 			JButton tempLookButton = (JButton) pickTurnPanel.getComponent(2);
 			JButton tempShootButton = (JButton) pickTurnPanel.getComponent(3);
-			if (canLook)
-			{
+			this.canLook = canLook;
+			this.canShoot = canShoot;
+			if (canLook) {
 				tempLookButton.setEnabled(true);
-				tempLookButton.setText("Look");
-			}
-			else
-			{
+				tempLookButton.setText("Look (W)");
+			} else {
 				tempLookButton.setEnabled(false);
 				tempLookButton.setText("Already Looked");
 			}
-			if (canShoot)
-			{
+			if (canShoot) {
 				tempShootButton.setEnabled(true);
-				tempShootButton.setText("Shoot");
-			}
-			else
-			{
+				tempShootButton.setText("Shoot (E)");
+			} else {
 				tempShootButton.setEnabled(false);
 				tempShootButton.setText("No Ammo");
 			}
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(pickTurnPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Main Menu Option");
 					frame.validate();
 				}
 			});
 			latch = new CountDownLatch(1);
+			mode = 1;
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			mode = 0;
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(pickTurnPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e)
-		{
+		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -909,78 +830,52 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public boolean printGameOver(boolean victorious)
-	{
+	public boolean printGameOver(boolean victorious) {
 		String message;
-		if (victorious)
-		{
+		if (victorious) {
 			message = new String("You have Won the Game!\nWould you like to play Again");
-		}
-		else
-		{
+		} else {
 			message = new String("You Lost all your lives...\nWould you like to Try Again?");
 		}
 		int option = JOptionPane.showConfirmDialog(frame, message, "Game Over", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE);
-		if (option == 0)
-		{
+		if (option == 0) {
 			// Yes = Play again
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public void printShotResult(boolean result)
-	{
+	public void printShotResult(boolean result) {
 		String message;
 		double dice = Math.random();
-		if (result)
-		{
-			if (dice < .25)
-			{
+		if (result) {
+			if (dice < .25) {
 				message = new String("You killed a Ninja");
-			}
-			else if (dice < .50)
-			{
+			} else if (dice < .50) {
 				message = new String("A Ninja is now dead");
-			}
-			else if (dice < .75)
-			{
+			} else if (dice < .75) {
 				message = new String("Ninja just said his last words at your hands");
-			}
-			else
-			{
+			} else {
 				message = new String("One less Ninja to worry about");
 			}
-		}
-		else
-		{
-			if (dice < .25)
-			{
+		} else {
+			if (dice < .25) {
 				message = new String("Wasted a Bullet");
-			}
-			else if (dice < .50)
-			{
+			} else if (dice < .50) {
 				message = new String("Ninjas are uneffected by you");
-			}
-			else if (dice < .75)
-			{
+			} else if (dice < .75) {
 				message = new String("Stop shooting blindly, you missed them all");
-			}
-			else
-			{
+			} else {
 				message = new String("Shot in the wrong direction");
 			}
 		}
-		txtArea.setText(message);
+		txtArea.setText(message);//TODO leave JOptionPane message
 	}
 
-	class ResolutionQueryDialog extends JDialog
-	{
+	class ResolutionQueryDialog extends JDialog {
 
 		/**
 		 * ID of this version of the Dialog
@@ -1010,14 +905,12 @@ public class GraphicalUI extends UserInterface
 		/**
 		 * @return the verified Pixel count
 		 */
-		public int getPixels()
-		{
+		public int getPixels() {
 			return enteredpixels;
 		}
 
 		/** Creates the reusable dialog. */
-		public ResolutionQueryDialog(JFrame window)
-		{
+		public ResolutionQueryDialog(JFrame window) {
 			super(window, true);
 			setTitle("Resolution Size Query");
 
@@ -1026,29 +919,21 @@ public class GraphicalUI extends UserInterface
 			String msgString1 = "What length do you want the Map Tokens to be?\nEnter Size in pixel count, range from (10-100)";
 			Object[] array = { msgString1, pixelField };
 
-			btn1.addActionListener(new ActionListener()
-			{
+			btn1.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					btn1.setEnabled(false);
 					boolean saveable = false;
-					try
-					{
+					try {
 						enteredpixels = (int) pixelField.getValue();
 						saveable = true;
-					}
-					catch (ClassCastException e)
-					{
+					} catch (ClassCastException e) {
 
 					}
-					if (saveable)
-					{
+					if (saveable) {
 						setVisible(false);
-					}
-					else
-					{
+					} else {
 						JOptionPane.showMessageDialog(ResolutionQueryDialog.this, "Number Invalid", "Bad Input",
 								JOptionPane.ERROR_MESSAGE);
 						pixelField.requestFocusInWindow();
@@ -1065,26 +950,21 @@ public class GraphicalUI extends UserInterface
 			setContentPane(optionPane);
 
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent we)
-				{
+			addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent we) {
 					setVisible(false);
 				}
 			});
 
-			addComponentListener(new ComponentAdapter()
-			{
-				public void componentShown(ComponentEvent ce)
-				{
+			addComponentListener(new ComponentAdapter() {
+				public void componentShown(ComponentEvent ce) {
 					pixelField.requestFocusInWindow();
 				}
 			});
 		}
 	}
 
-	class FileNameQueryDialog extends JDialog
-	{
+	class FileNameQueryDialog extends JDialog {
 
 		/**
 		 * ID of this version of the Dialog
@@ -1114,14 +994,12 @@ public class GraphicalUI extends UserInterface
 		/**
 		 * @return the verified Filename
 		 */
-		public String getFilename()
-		{
+		public String getFilename() {
 			return enteredFileName;
 		}
 
 		/** Creates the reusable dialog. */
-		public FileNameQueryDialog(JFrame window)
-		{
+		public FileNameQueryDialog(JFrame window) {
 			super(window, true);
 			setTitle("File Name Query");
 
@@ -1131,31 +1009,23 @@ public class GraphicalUI extends UserInterface
 			String msgString1 = "What do you want to name your Save File to?";
 			Object[] array = { msgString1, fileNameField };
 
-			btn1.addActionListener(new ActionListener()
-			{
+			btn1.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					btn1.setEnabled(false);
 					enteredFileName = fileNameField.getText();
 					boolean saveable = false;
-					try
-					{
+					try {
 						System.out.println(
 								Paths.get(GameEngine.getSavePath() + File.separator + enteredFileName + ".ser"));
 						saveable = true;
-					}
-					catch (InvalidPathException e)
-					{
+					} catch (InvalidPathException e) {
 
 					}
-					if (saveable)
-					{
+					if (saveable) {
 						setVisible(false);
-					}
-					else
-					{
+					} else {
 						fileNameField.selectAll();
 						JOptionPane.showMessageDialog(FileNameQueryDialog.this,
 								"SaveFile Name invalid, please remove invalid characters", "Bad Filename",
@@ -1174,18 +1044,14 @@ public class GraphicalUI extends UserInterface
 			setContentPane(optionPane);
 
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent we)
-				{
+			addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent we) {
 					setVisible(false);
 				}
 			});
 
-			addComponentListener(new ComponentAdapter()
-			{
-				public void componentShown(ComponentEvent ce)
-				{
+			addComponentListener(new ComponentAdapter() {
+				public void componentShown(ComponentEvent ce) {
 					fileNameField.requestFocusInWindow();
 				}
 			});
@@ -1193,8 +1059,7 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public String querySaveFileName()
-	{
+	public String querySaveFileName() {
 		FileNameQueryDialog dialog = new FileNameQueryDialog(frame);
 		dialog.pack();
 		dialog.setLocationRelativeTo(frame);
@@ -1203,17 +1068,14 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printInvalidMove()
-	{
+	public void printInvalidMove() {
 		JOptionPane.showMessageDialog(frame, "Can Not Choose this Direction!", "Invalid Direction",
 				JOptionPane.ERROR_MESSAGE);
 	}
 
 	@Override
-	public String queryLoadFileName(String[] saves)
-	{
-		if (saves.length == 0)
-		{
+	public String queryLoadFileName(String[] saves) {
+		if (saves.length == 0) {
 			JOptionPane.showMessageDialog(frame, "No Save Files Found!\nStarting new Game...", "No Save Data",
 					JOptionPane.ERROR_MESSAGE);
 			return null;
@@ -1223,56 +1085,45 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printDamaged()
-	{
+	public void printDamaged() {
 		JOptionPane.showMessageDialog(frame, "You have been Struck!\nYou must retreat to the first Room...",
 				"Life Lost", JOptionPane.WARNING_MESSAGE);
 	}
 
 	@Override
-	public boolean offerDifficulty()
-	{
+	public boolean offerDifficulty() {
 		int option = JOptionPane.showConfirmDialog(frame, "Would you like to Enable the Ninja AI?",
 				"Difficulty Selection", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (option == 0)
-		{
+		if (option == 0) {
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public char queryDirection(String actionType)
-	{
-		try
-		{
-			EventQueue.invokeAndWait(new Runnable()
-			{
+	public char queryDirection(String actionType) {
+		try {
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(pickDirectionPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Direction to " + actionType + " In");
 					frame.validate();
 				}
 			});
 			latch = new CountDownLatch(1);
+			mode = 2;
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			mode = 0;
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(pickDirectionPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e)
-		{
+		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -1280,19 +1131,14 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive)
-	{
+	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
 		char[][] formattedMap = formatMap(map, lookDirection, debug, radarActive);
-		for (int x = 0; x < 9; x++)
-		{
-			for (int y = 0; y < 9; y++)
-			{
-				if (!(oldmap[x][y] == formattedMap[x][y]))
-				{
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				if (!(oldmap[x][y] == formattedMap[x][y])) {
 					ImageIcon icon;
 
-					switch (formattedMap[x][y])
-					{
+					switch (formattedMap[x][y]) {
 					case 'P':
 						icon = icons[0];// ?
 						break;
@@ -1332,34 +1178,32 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printRoomContents(boolean briefcase)
-	{
+	public void printRoomContents(boolean briefcase) {
 		String message;
-		if (briefcase)
-		{
+		if (briefcase) {
 			message = new String("The briefcase is in this room!");
-		}
-		else
-		{
+		} else {
 			message = new String("This room is empty.");
 		}
 		JOptionPane.showMessageDialog(frame, message, "Room Contents", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	@Override
-	public void printPowerUp(char item)
-	{
+	public void printPowerUp(char item) {
 		String message;
-		if (item == 'a') message = new String("You've found a bullet!\nYou now have max ammo");
-		else if (item == 'i') message = new String("You're invincible for 5 turns!\nNinjas can't kill you.");
-		else if (item == 'r') message = new String("You've found a radar!\nYou know where the briefcase is.");
-		else throw new IllegalArgumentException();
+		if (item == 'a')
+			message = new String("You've found a bullet!\nYou now have max ammo");
+		else if (item == 'i')
+			message = new String("You're invincible for 5 turns!\nNinjas can't kill you.");
+		else if (item == 'r')
+			message = new String("You've found a radar!\nYou know where the briefcase is.");
+		else
+			throw new IllegalArgumentException();
 		JOptionPane.showMessageDialog(frame, message, "Powerup Get!", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	@Override
-	public void confirmSaveFile(String path)
-	{
+	public void confirmSaveFile(String path) {
 		// Does nothing in GUI
 	}
 }
