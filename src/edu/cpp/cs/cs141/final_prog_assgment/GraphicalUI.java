@@ -33,14 +33,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -66,6 +67,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -163,6 +165,7 @@ public class GraphicalUI extends UserInterface
 			{
 				try
 				{
+					new File(GameEngine.getSavePath()).mkdirs();
 					Desktop.getDesktop().open(new File(GameEngine.getSavePath()));
 				}
 				catch (IOException e1)
@@ -216,9 +219,7 @@ public class GraphicalUI extends UserInterface
 	{
 		try
 		{
-			
-			File audioFile = new File(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/background.wav").toURI());
-			audioStream = AudioSystem.getAudioInputStream(audioFile);
+			audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(GraphicalUI.class.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
 			AudioFormat format = audioStream.getFormat();
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 			if (AudioSystem.isLineSupported(info))
@@ -236,7 +237,7 @@ public class GraphicalUI extends UserInterface
 						{
 							try
 							{
-								audioStream = AudioSystem.getAudioInputStream(audioFile);
+								audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(GraphicalUI.class.getResourceAsStream("/edu/cpp/cs/cs141/final_prog_assgment/background.wav")));
 								byte[] bytesBuffer = new byte[50];
 					            int bytesRead = -1;
 								while ((bytesRead = audioStream.read(bytesBuffer)) != -1) {
@@ -276,10 +277,6 @@ public class GraphicalUI extends UserInterface
 		catch (IOException e)
 		{
 			e.printStackTrace();
-		}
-		catch (URISyntaxException e1)
-		{
-			e1.printStackTrace();
 		}
 		catch (LineUnavailableException e1)
 		{
@@ -402,6 +399,11 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel.add(lblPickTurn, "flowy,cell 0 0 5 1,alignx center", -1);
 		JButton btnMove = new JButton("Move")
 		{
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected void paintComponent(Graphics g)
 			{
@@ -432,6 +434,11 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel.add(btnMove, "cell 0 1,growx", -1);
 		JButton btnLook = new JButton("Look")
 		{
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 2856717422567232857L;
+
 			@Override
 			protected void paintComponent(Graphics g)
 			{
@@ -462,6 +469,12 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel.add(btnLook, "cell 1 1,growx", -1);
 		JButton btnShoot = new JButton("Shoot")
 		{
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 4429422460496975540L;
+
 			@Override
 			protected void paintComponent(Graphics g)
 			{
@@ -502,6 +515,11 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel.add(btnSave, "cell 3 1,growx", -1);
 		JButton btnQuit2 = new JButton("Quit")
 		{
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -3223908660254407736L;
+
 			@Override
 			protected void paintComponent(Graphics g)
 			{
