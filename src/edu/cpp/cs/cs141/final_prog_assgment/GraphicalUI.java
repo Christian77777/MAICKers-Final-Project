@@ -173,17 +173,10 @@ public class GraphicalUI extends UserInterface
 			public void actionPerformed(ActionEvent e)
 			{
 				Random random = new Random();
-				int use = random.nextInt(9);
-				for (int x = 0; x < 9; x++)
-				{
-					for (int y = 0; y < 9; y++)
-					{
-						Labelmap[x][y].setIcon(icons[use]);
-					}
-				}
+				Labelmap[random.nextInt(9)][random.nextInt(9)].setIcon(icons[random.nextInt(9)]);
+		
 			}
 		});
-		scheduler.setInitialDelay(10000);
 		System.out.println("JFrame Constructed");
 		frame.setVisible(true);
 		scheduler.start();
@@ -219,9 +212,9 @@ public class GraphicalUI extends UserInterface
 		{
 			for (int y = 0; y < 9; y++)
 			{
-				Labelmap[x][y] = new JLabel(icons[0]);
+				Labelmap[x][y] = new JLabel(icons[8]);
 				mapPanel.add(Labelmap[x][y]);
-				oldmap[x][y] = 'P';
+				oldmap[x][y] = '\u0000';
 			}
 		}
 	}
