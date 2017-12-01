@@ -16,25 +16,30 @@
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import javax.imageio.ImageIO;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -43,18 +48,26 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
-import com.sun.org.apache.bcel.internal.util.ClassLoader;
+
 import net.miginfocom.swing.MigLayout;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.SwingConstants;
 
 /**
  * This Class is the Implementation of the Option GUI Interface for the Program
  */
-public class GraphicalUI extends UserInterface
-{
+public class GraphicalUI extends UserInterface {
 	private JFrame frame;
 	private JPanel mapPanel;
 	private JPanel menuPanel;
@@ -69,20 +82,34 @@ public class GraphicalUI extends UserInterface
 	private JPanel pickDirectionPanel;
 	private char pickDirectionOption;
 	private JSeparator separator1;
+	private ImageIcon[] icons = new ImageIcon[9];
+	private int pixelCount = 20;
 
-	public GraphicalUI()
-	{
+	/**
+	 * Schedules Threads intended to change images in Map every second. Visual
+	 * Effect only for GUI
+	 */
+	private Timer scheduler;
+	private JMenuBar menuBar;
+	private JCheckBoxMenuItem chckbxmntmMuteMusic;
+	private JMenuItem mntmOpenFolder;
+	private JMenuItem mntmChangeImageResolution;
+
+	public GraphicalUI() {
+		System.out.println("GUI Enabled, Ignoring Console");
 		frame = new JFrame("Spy Game");
 		frame.setIconImage(Toolkit.getDefaultToolkit()
 				.getImage(GraphicalUI.class.getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new MigLayout("", "[grow]", "[grow][][][grow]"));
+		frame.getContentPane().setLayout(new MigLayout("", "[grow]", "[grow][][][100px:n]"));
 		frame.setSize(800, 800);
+		setMapImageSize(10);
 
 		// Create MapPanel
 		mapPanel = new JPanel();
 		mapPanel.setBorder(new LineBorder(new Color(0, 0, 0), 4, true));
-		mapPanel.setLayout(new MigLayout("", "[][][][][][][][][]", "[][][][][][][][][]"));
+		GridLayout panelConstraints = new GridLayout(9, 9);
+		mapPanel.setLayout(panelConstraints);
 
 		// Create MenuPanel
 		menuPanel = new JPanel();
@@ -92,40 +119,34 @@ public class GraphicalUI extends UserInterface
 		JLabel lblMainMenu = new JLabel("Main Menu");
 		menuPanel.add(lblMainMenu, "flowy,cell 0 0 4 1,alignx center");
 		JButton btnNewGame = new JButton("New Game");
-		btnNewGame.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnNewGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				scheduler.stop();
 				menuOption = 1;
 				latch.countDown();
 			}
 		});
 		menuPanel.add(btnNewGame, "cell 0 1,growx");
 		JButton btnLoadGame = new JButton("Load Game");
-		btnLoadGame.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnLoadGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				scheduler.stop();
 				menuOption = 2;
 				latch.countDown();
 			}
 		});
 		menuPanel.add(btnLoadGame, "cell 1 1,growx");
 		JButton btnHelp = new JButton("Help");
-		btnHelp.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				menuOption = 3;
 				latch.countDown();
 			}
 		});
 		menuPanel.add(btnHelp, "cell 2 1,growx");
 		JButton btnQuit = new JButton("Quit");
-		btnQuit.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
@@ -135,9 +156,9 @@ public class GraphicalUI extends UserInterface
 		pickTurnPanel = new JPanel();
 		pickTurnPanel.setBorder(null);
 		pickTurnPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow][grow]", "[][]"));
-		JLabel lblPickTurn = new JLabel("What Action do you WIsh to take");
+		JLabel lblPickTurn = new JLabel("What Action do you Wish to take");
 		lblPickTurn.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				pickTurnOption = -1;
@@ -145,109 +166,95 @@ public class GraphicalUI extends UserInterface
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e) { }
+			public void mousePressed(MouseEvent e) {
+			}
 
 			@Override
-			public void mouseReleased(MouseEvent e) { }
+			public void mouseReleased(MouseEvent e) {
+			}
 
 			@Override
-			public void mouseEntered(MouseEvent e) { }
+			public void mouseEntered(MouseEvent e) {
+			}
 
 			@Override
-			public void mouseExited(MouseEvent e) { }
+			public void mouseExited(MouseEvent e) {
+			}
 		});
 		pickTurnPanel.add(lblPickTurn, "flowy,cell 0 0 5 1,alignx center", -1);
 		JButton btnMove = new JButton("Move");
-		btnMove.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnMove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 1;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnMove, "cell 0 1,growx", -1);
 		JButton btnLook = new JButton("Look");
-		btnLook.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnLook.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 2;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnLook, "cell 1 1,growx", -1);
 		JButton btnShoot = new JButton("Shoot");
-		btnShoot.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnShoot.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 3;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnShoot, "cell 2 1,growx", -1);
 		JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickTurnOption = 4;
 				latch.countDown();
 			}
 		});
 		pickTurnPanel.add(btnSave, "cell 3 1,growx", -1);
 		JButton btnQuit2 = new JButton("Quit");
-		btnQuit2.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnQuit2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
 		pickTurnPanel.add(btnQuit2, "cell 4 1,growx", -1);
-		
-		//Create Direction Panel
+
+		// Create Direction Panel
 		pickDirectionPanel = new JPanel();
 		pickDirectionPanel.setBorder(null);
 		pickDirectionPanel.setLayout(new MigLayout("", "[grow][grow][grow]", "[][][]"));
 		JLabel lblPickDirection = new JLabel("Which Direction?");
 		pickDirectionPanel.add(lblPickDirection, "flowy,cell 1 1,alignx center", -1);
 		JButton btnNorth = new JButton("North");
-		btnNorth.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnNorth.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'n';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnNorth, "cell 1 0,growx", -1);
 		JButton btnEast = new JButton("East");
-		btnEast.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnEast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'e';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnEast, "cell 2 1,growx", -1);
 		JButton btnSouth = new JButton("South");
-		btnSouth.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnSouth.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 's';
 				latch.countDown();
 			}
 		});
 		pickDirectionPanel.add(btnSouth, "cell 1 2,growx", -1);
 		JButton btnWest = new JButton("West");
-		btnWest.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnWest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				pickDirectionOption = 'w';
 				latch.countDown();
 			}
@@ -262,44 +269,161 @@ public class GraphicalUI extends UserInterface
 		txtArea.setWrapStyleWord(true);
 		txtArea.setLineWrap(true);
 		txtArea.setEditable(false);
-		frame.getContentPane().add(txtArea, "cell 0 3,grow");
+		frame.getContentPane().add(txtArea, "cell 0 3,grow,wmin 10");
 
-		for (int x = 0; x < 9; x++)
-		{
-			for (int y = 0; y < 9; y++)
-			{
-				Labelmap[x][y] = new JLabel();
-				mapPanel.add(Labelmap[x][y], "cell " + y + " " + x);
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				Labelmap[x][y] = new JLabel(icons[0]);
+				Labelmap[x][y].setIcon(icons[0]);
+				mapPanel.add(Labelmap[x][y]);
 				oldmap[x][y] = 'u';
 			}
 
 		}
-		frame.getContentPane().add(mapPanel, "cell 0 0");
-		System.out.println("GUI Enabled, Ignoring Console");
+		frame.getContentPane().add(mapPanel, "cell 0 0,alignx center,growy");
+
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		mntmChangeImageResolution = new JMenuItem("Change Image Resolution");
+		mntmChangeImageResolution.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SpinnerModel model = new SpinnerNumberModel(20, 10, 100, 10);
+				JSpinner counter = new JSpinner(model);
+				//Not happening
+				int selection = JOptionPane.showOptionDialog(frame, "What Resolution for a single Image is best for your Image\nA Good Range is (30 - 80)", "Choose Resolution", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] {counter}, null);//Better for using JComponents
+				System.out.println(selection);
+			}
+		});
+		menuBar.add(mntmChangeImageResolution);
+
+		mntmOpenFolder = new JMenuItem("Open Folder");
+		menuBar.add(mntmOpenFolder);
+
+		chckbxmntmMuteMusic = new JCheckBoxMenuItem("Mute Music");
+		menuBar.add(chckbxmntmMuteMusic);
+
+		frame.addComponentListener(new ComponentListener() {
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+		System.out.println("JFrame Constructed");
 		frame.setVisible(true);
+		scheduler = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Random random = new Random();
+				int use = random.nextInt(9);
+				for (int x = 0; x < 9; x++) {
+					for (int y = 0; y < 9; y++) {
+						Labelmap[x][y].setIcon(icons[use]);
+					}
+				}
+			}
+		});
+		scheduler.start();
 		welcomeMessage();
-		JOptionPane.showMessageDialog(frame, "GUI Enabled, but Incomplete", "Incomplete Code",
-				JOptionPane.INFORMATION_MESSAGE,
-				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/logo.png")));
+	}
+
+	private void setMapImageSize(int size) {
+		icons[0] = new ImageIcon(new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/spy.png"))
+				.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[1] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/ninja.png")).getImage()
+						.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[2] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/bullet.jpg")).getImage()
+						.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[3] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/invincibility.jpg"))
+						.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[4] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/radar.png")).getImage()
+						.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[5] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/briefcase.gif")).getImage()
+						.getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[6] = new ImageIcon(new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/room.jpg"))
+				.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[7] = new ImageIcon(new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/fog.png"))
+				.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+		icons[8] = new ImageIcon(
+				new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/whiteSquare.jpg"))
+						.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+
+	}
+
+	private void resetMap() {
+		if (mapPanel.isVisible()) {
+			mapPanel.setSize(mapPanel.getHeight(), mapPanel.getHeight());
+			for(int x = 0; x < 9; x++)
+			{
+				for(int y = 0; y < 9; y++)
+				{
+					ImageIcon icon;
+					switch (oldmap[x][y]) {
+					case 'P':
+						icon = icons[0];// ?
+						break;
+					case 'N':
+						icon = icons[1];// https://vignette4.wikia.nocookie.net/clubpenguin/images/d/d8/Ninja_Old_Header.png/revision/latest?cb=20140616202121
+						break;
+					case 'A':
+						icon = icons[2];// https://images-na.ssl-images-amazon.com/images/I/31%2BRCLzutKL.jpg
+						break;
+					case 'I':
+						icon = icons[3];// https://i.pinimg.com/736x/40/86/2e/40862e0ac7efb875d416c7b03ab8dca2--super-mario-party-super-mario-bros.jpg
+						break;
+					case 'R':
+						icon = icons[4];// https://pixabay.com/p-38078/?no_redirect
+						break;
+					case 'B':
+						icon = icons[5];// http://www.aperfectworld.org/clipart/office/briefcase08.gif
+						break;
+					case '#':
+						icon = icons[6];// https://pbs.twimg.com/media/C8pOpUXXsAARLsf.jpg
+						break;
+					case '\u2022':
+						icon = icons[7];// http://moziru.com/images/drawn-fog-1.png
+						break;
+					case '\u0000':
+						icon = icons[8];// https://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=65691568
+						break;
+					default:
+						throw new IllegalArgumentException();
+					}
+					Labelmap[x][y].setIcon(icon);
+				}
+			}
+		}
 	}
 
 	@Override
-	public void welcomeMessage()
-	{
+	public void welcomeMessage() {
 		txtArea.setText("Welcome to the game!");
 	}
 
 	@Override
-	public int printMainMenu()
-	{
-		try
-		{
-			EventQueue.invokeAndWait(new Runnable()
-			{
+	public int printMainMenu() {
+		try {
+			EventQueue.invokeAndWait(new Runnable() {
 
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(menuPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Main Menu Option");
 					frame.validate();
@@ -307,18 +431,14 @@ public class GraphicalUI extends UserInterface
 			});
 			latch = new CountDownLatch(1);
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(menuPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e1)
-		{
+		} catch (InvocationTargetException | InterruptedException e1) {
 			e1.printStackTrace();
 			System.exit(1);
 		}
@@ -326,10 +446,8 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printHelp()
-	{
-		try
-		{
+	public void printHelp() {
+		try {
 			String[] messages = new String[6];
 			messages[0] = new String(
 					"\n\t The object of the game is to move your Spy character around the 9 by 9 grid board"
@@ -419,19 +537,14 @@ public class GraphicalUI extends UserInterface
 			txtArea.setText(messages[0]);
 			pageNumber = 0;
 			JButton continueHelp = new JButton("Next Page");
-			continueHelp.addActionListener(new ActionListener()
-			{
+			continueHelp.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e)
-				{
+				public void actionPerformed(ActionEvent e) {
 					pageNumber++;
-					if (pageNumber <= 5)
-					{
+					if (pageNumber <= 5) {
 						txtArea.setText(messages[pageNumber]);
-					}
-					else
-					{
+					} else {
 						frame.getContentPane().remove(continueHelp);
 						frame.validate();
 						txtArea.setText("");
@@ -440,11 +553,9 @@ public class GraphicalUI extends UserInterface
 				}
 
 			});
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(continueHelp, "cell 0 2,grow");
 					frame.validate();
 				}
@@ -452,50 +563,34 @@ public class GraphicalUI extends UserInterface
 			latch = new CountDownLatch(1);
 			latch.await();
 			pageNumber = 0;
-		}
-		catch (InvocationTargetException | InterruptedException e1)
-		{
+		} catch (InvocationTargetException | InterruptedException e1) {
 			e1.printStackTrace();
 			System.exit(1);
 		}
 	}
 
 	@Override
-	public int pickTurn(boolean canLook, boolean canShoot)
-	{
-		try
-		{
+	public int pickTurn(boolean canLook, boolean canShoot) {
+		try {
 			JButton tempLookButton = (JButton) pickTurnPanel.getComponent(2);
 			JButton tempShootButton = (JButton) pickTurnPanel.getComponent(3);
-			if (canLook)
-			{
+			if (canLook) {
 				tempLookButton.setEnabled(true);
 				tempLookButton.setText("Look");
-			}
-			else
-			{
+			} else {
 				tempLookButton.setEnabled(false);
 				tempLookButton.setText("Already Looked");
 			}
-			if (canShoot)
-			{
+			if (canShoot) {
 				tempShootButton.setEnabled(true);
 				tempShootButton.setText("Shoot");
-			}
-			else
-			{
+			} else {
 				tempShootButton.setEnabled(false);
 				tempShootButton.setText("No Ammo");
 			}
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
-					if(!mapPanel.isVisible())
-					{
-						mapPanel.setVisible(true);
-					}
+				public void run() {
 					frame.getContentPane().add(pickTurnPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Main Menu Option");
 					frame.validate();
@@ -503,18 +598,14 @@ public class GraphicalUI extends UserInterface
 			});
 			latch = new CountDownLatch(1);
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(pickTurnPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e)
-		{
+		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -522,33 +613,25 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public boolean printGameOver(boolean victorious)
-	{
+	public boolean printGameOver(boolean victorious) {
 		String message;
-		if (victorious)
-		{
+		if (victorious) {
 			message = new String("You have Won the Game!\nWould you like to play Again");
-		}
-		else
-		{
+		} else {
 			message = new String("You Lost all your lives...\nWould you like to Try Again?");
 		}
 		int option = JOptionPane.showConfirmDialog(frame, message, "Game Over", JOptionPane.YES_NO_OPTION,
 				JOptionPane.INFORMATION_MESSAGE);
-		if (option == 0)
-		{
+		if (option == 0) {
 			// Yes = Play again
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public void printShotResult(boolean result)
-	{
+	public void printShotResult(boolean result) {
 		String message;
 		double dice = Math.random();
 		if (result) {
@@ -575,9 +658,8 @@ public class GraphicalUI extends UserInterface
 		txtArea.setText(message);
 	}
 
-	class FileNameQueryDialog extends JDialog
-	{
-		
+	class FileNameQueryDialog extends JDialog {
+
 		/**
 		 * ID of this version of the Dialog
 		 */
@@ -592,7 +674,7 @@ public class GraphicalUI extends UserInterface
 		 * Points to String in JTextField
 		 */
 		private String enteredFileName;
-		
+
 		/**
 		 * Internal Panel inside JDialog
 		 */
@@ -606,52 +688,42 @@ public class GraphicalUI extends UserInterface
 		/**
 		 * @return the verified Username
 		 */
-		public String getUsername()
-		{
+		public String getUsername() {
 			return enteredFileName;
 		}
-		
+
 		/** Creates the reusable dialog. */
-		public FileNameQueryDialog(JFrame window)
-		{
+		public FileNameQueryDialog(JFrame window) {
 			super(window, true);
 			setTitle("File Name Query");
 
 			fileNameField = new JTextField();
 			fileNameField.setText("");
-			
+
 			String msgString1 = "What do you want to name your Save File to?";
 			Object[] array = { msgString1, fileNameField };
 
-			btn1.addActionListener(new ActionListener()
-			{
+			btn1.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					btn1.setEnabled(false);
 					enteredFileName = fileNameField.getText();
 					boolean saveable = false;
-					try
-					{
+					try {
 						System.out.println(
 								Paths.get(GameEngine.getSavePath() + File.separator + enteredFileName + ".ser"));
 						saveable = true;
+					} catch (InvalidPathException e) {
+
 					}
-					catch (InvalidPathException e)
-					{
-						
-					}
-					if (saveable)
-					{
+					if (saveable) {
 						setVisible(false);
-					}
-					else
-					{
+					} else {
 						fileNameField.selectAll();
 						JOptionPane.showMessageDialog(FileNameQueryDialog.this,
-								"SaveFile Name invalid, please remove invalid characters",
-								"Bad Filename", JOptionPane.ERROR_MESSAGE);
+								"SaveFile Name invalid, please remove invalid characters", "Bad Filename",
+								JOptionPane.ERROR_MESSAGE);
 						fileNameField.requestFocusInWindow();
 						btn1.setEnabled(true);
 					}
@@ -666,18 +738,14 @@ public class GraphicalUI extends UserInterface
 			setContentPane(optionPane);
 
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent we)
-				{
+			addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent we) {
 					setVisible(false);
 				}
 			});
 
-			addComponentListener(new ComponentAdapter()
-			{
-				public void componentShown(ComponentEvent ce)
-				{
+			addComponentListener(new ComponentAdapter() {
+				public void componentShown(ComponentEvent ce) {
 					fileNameField.requestFocusInWindow();
 				}
 			});
@@ -685,62 +753,54 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public String querySaveFileName()
-	{
+	public String querySaveFileName() {
 		FileNameQueryDialog dialog = new FileNameQueryDialog(frame);
 		dialog.pack();
 		dialog.setLocationRelativeTo(frame);
-		dialog.setVisible(true);//Blocks until Option made
+		dialog.setVisible(true);// Blocks until Option made
 		return dialog.getUsername();
 	}
 
 	@Override
-	public void printInvalidMove()
-	{
-		JOptionPane.showMessageDialog(frame, "Can Not Choose this Direction!", "Invalid Direction", JOptionPane.ERROR_MESSAGE);
+	public void printInvalidMove() {
+		JOptionPane.showMessageDialog(frame, "Can Not Choose this Direction!", "Invalid Direction",
+				JOptionPane.ERROR_MESSAGE);
 	}
 
 	@Override
-	public String queryLoadFileName(String[] saves)
-	{
-		if(saves.length == 0)
-		{
-			JOptionPane.showMessageDialog(frame, "No Save Files Found!\nStarting new Game...", "No Save Data", JOptionPane.ERROR_MESSAGE);
+	public String queryLoadFileName(String[] saves) {
+		if (saves.length == 0) {
+			JOptionPane.showMessageDialog(frame, "No Save Files Found!\nStarting new Game...", "No Save Data",
+					JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
-		return (String)JOptionPane.showInputDialog(frame, "Which Save File would you like to Load?", "Load Save", JOptionPane.QUESTION_MESSAGE, null, saves, saves[0]);
+		return (String) JOptionPane.showInputDialog(frame, "Which Save File would you like to Load?", "Load Save",
+				JOptionPane.QUESTION_MESSAGE, null, saves, saves[0]);
 	}
 
 	@Override
-	public void printDamaged()
-	{
-		JOptionPane.showMessageDialog(frame, "You have been Struck!\nYou must retreat to the first Room...", "Life Lost", JOptionPane.WARNING_MESSAGE);
+	public void printDamaged() {
+		JOptionPane.showMessageDialog(frame, "You have been Struck!\nYou must retreat to the first Room...",
+				"Life Lost", JOptionPane.WARNING_MESSAGE);
 	}
 
 	@Override
-	public boolean offerDifficulty()
-	{
-		int option = JOptionPane.showConfirmDialog(frame, "Would you like to Enable the Ninja AI?", "Difficulty Selection", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if(option == 0)
-		{
+	public boolean offerDifficulty() {
+		int option = JOptionPane.showConfirmDialog(frame, "Would you like to Enable the Ninja AI?",
+				"Difficulty Selection", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if (option == 0) {
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	public char queryDirection(String actionType)
-	{
-		try
-		{
-			EventQueue.invokeAndWait(new Runnable()
-			{
+	public char queryDirection(String actionType) {
+		try {
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().add(pickDirectionPanel, "cell 0 2,grow");
 					txtArea.setText("Please Select a Direction to " + actionType + " In");
 					frame.validate();
@@ -748,18 +808,14 @@ public class GraphicalUI extends UserInterface
 			});
 			latch = new CountDownLatch(1);
 			latch.await();
-			EventQueue.invokeAndWait(new Runnable()
-			{
+			EventQueue.invokeAndWait(new Runnable() {
 				@Override
-				public void run()
-				{
+				public void run() {
 					frame.getContentPane().remove(pickDirectionPanel);
 					frame.validate();
 				}
 			});
-		}
-		catch (InvocationTargetException | InterruptedException e)
-		{
+		} catch (InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -767,38 +823,45 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive)
-	{
+	public void printMap(String[] map, char lookDirection, boolean debug, boolean radarActive) {
 		char[][] formattedMap = formatMap(map, lookDirection, debug, radarActive);
-		for (int x = 0; x < 9; x++)
-		{
-			for (int y = 0; y < 9; y++)
-			{
-				if(!(oldmap[x][y] == formattedMap[x][y]))
-				{
-					String path;
-				switch (formattedMap[x][y]) {
-	            case 'P': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/spy.png");//?
-	                     break;
-	            case 'N': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/ninja.png");//https://vignette4.wikia.nocookie.net/clubpenguin/images/d/d8/Ninja_Old_Header.png/revision/latest?cb=20140616202121
-	            		break;
-	            case 'A': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/bullet.jpg");//https://images-na.ssl-images-amazon.com/images/I/31%2BRCLzutKL.jpg
-	            		break;
-	            case 'I': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/invincibility.jpg");//https://i.pinimg.com/736x/40/86/2e/40862e0ac7efb875d416c7b03ab8dca2--super-mario-party-super-mario-bros.jpg
-                		break;
-	            case 'R': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/radar.png");//https://pixabay.com/p-38078/?no_redirect
-                		break;
-	            case 'B': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/briefcase.gif");//http://www.aperfectworld.org/clipart/office/briefcase08.gif
-                		break;
-	            case '#': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/room.jpg");//https://pbs.twimg.com/media/C8pOpUXXsAARLsf.jpg
-                		break;
-	            case '\u2022': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/fog.png");//http://moziru.com/images/drawn-fog-1.png
-                		break;
-	            case '\u0000': path = new String("/edu/cpp/cs/cs141/final_prog_assgment/whiteSquare.jpg");//https://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=65691568
-                		break;
-	            default:  throw new IllegalArgumentException();
-				}
-				Labelmap[x][y].setIcon(new ImageIcon(new ImageIcon(getClass().getResource(path)).getImage().getScaledInstance(75, 75, Image.SCALE_SMOOTH)));
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				if (!(oldmap[x][y] == formattedMap[x][y])) {
+					ImageIcon icon;
+
+					switch (formattedMap[x][y]) {
+					case 'P':
+						icon = icons[0];// ?
+						break;
+					case 'N':
+						icon = icons[1];// https://vignette4.wikia.nocookie.net/clubpenguin/images/d/d8/Ninja_Old_Header.png/revision/latest?cb=20140616202121
+						break;
+					case 'A':
+						icon = icons[2];// https://images-na.ssl-images-amazon.com/images/I/31%2BRCLzutKL.jpg
+						break;
+					case 'I':
+						icon = icons[3];// https://i.pinimg.com/736x/40/86/2e/40862e0ac7efb875d416c7b03ab8dca2--super-mario-party-super-mario-bros.jpg
+						break;
+					case 'R':
+						icon = icons[4];// https://pixabay.com/p-38078/?no_redirect
+						break;
+					case 'B':
+						icon = icons[5];// http://www.aperfectworld.org/clipart/office/briefcase08.gif
+						break;
+					case '#':
+						icon = icons[6];// https://pbs.twimg.com/media/C8pOpUXXsAARLsf.jpg
+						break;
+					case '\u2022':
+						icon = icons[7];// http://moziru.com/images/drawn-fog-1.png
+						break;
+					case '\u0000':
+						icon = icons[8];// https://www.polyvore.com/cgi/img-thing?.out=jpg&size=l&tid=65691568
+						break;
+					default:
+						throw new IllegalArgumentException();
+					}
+					Labelmap[x][y].setIcon(icon);
 				}
 				oldmap[x][y] = formattedMap[x][y];
 			}
@@ -807,23 +870,18 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void printRoomContents(boolean briefcase)
-	{
+	public void printRoomContents(boolean briefcase) {
 		String message;
-		if(briefcase)
-		{
+		if (briefcase) {
 			message = new String("The briefcase is in this room!");
-		}
-		else
-		{
+		} else {
 			message = new String("This room is empty.");
 		}
 		JOptionPane.showMessageDialog(frame, message, "Room Contents", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	@Override
-	public void printPowerUp(char item)
-	{
+	public void printPowerUp(char item) {
 		String message;
 		if (item == 'a')
 			message = new String("You've found a bullet!\nYou now have max ammo");
@@ -837,8 +895,7 @@ public class GraphicalUI extends UserInterface
 	}
 
 	@Override
-	public void confirmSaveFile(String path)
-	{
-		//Does nothing in GUI
+	public void confirmSaveFile(String path) {
+		// Does nothing in GUI
 	}
 }

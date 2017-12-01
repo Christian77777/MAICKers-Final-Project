@@ -243,7 +243,7 @@ public class GameEngine {
 	 */
 	public void executePlayerTurn() {
 		ui.printMap(board, 'f', debug, radar);
-		int choice;
+		int choice; 
 		choice=ui.pickTurn(true, player.hasAmmo());
 		while (choice == -1) {
 			debug = !debug;
