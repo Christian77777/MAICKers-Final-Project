@@ -25,19 +25,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Port;
+import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -52,7 +60,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
@@ -81,7 +88,7 @@ public class GraphicalUI extends UserInterface
 	private ImageIcon[] icons = new ImageIcon[9];
 	private ImageIcon[] baseIcons = new ImageIcon[9];
 	private int pixelCount = 20;
-
+	private SourceDataLine soundLine;
 	/**
 	 * Schedules Threads intended to change images in Map every second. Visual
 	 * Effect only for GUI
@@ -109,7 +116,7 @@ public class GraphicalUI extends UserInterface
 		createPickTurnPanel();
 
 		createDirectionPanel();
-		
+
 		createMapPanel();
 		frame.getContentPane().add(mapPanel, "cell 0 0,grow");
 
@@ -174,17 +181,83 @@ public class GraphicalUI extends UserInterface
 			{
 				Random random = new Random();
 				Labelmap[random.nextInt(9)][random.nextInt(9)].setIcon(icons[random.nextInt(9)]);
-		
+				// Java default char value is equal to "Blank Space" keyword,
+				// but because it will never affect the old map incorrectly as
+				// looking
+
 			}
 		});
 		System.out.println("JFrame Constructed");
 		frame.setVisible(true);
 		scheduler.start();
+		setupAudio();
 		welcomeMessage();
 	}
-	
+
+	private void setupAudio()
+	{
+		try
+		{
+			File audioFile = new File(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/background.wav").toURI());
+			System.out.println(audioFile.getAbsolutePath());
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+			AudioFormat format = audioStream.getFormat();
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+			if (AudioSystem.isLineSupported(info))
+			{
+				Thread thread = new Thread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						boolean functioning = true;
+						do
+						{
+							try
+							{
+								soundLine = (SourceDataLine) AudioSystem.getLine(info);
+								soundLine.open(format);
+								soundLine.start();
+								byte[] bytesBuffer = new byte[4096];
+								int bytesRead = -1;
+								while ((bytesRead = audioStream.read(bytesBuffer)) != -1)
+								{
+									soundLine.write(bytesBuffer, 0, bytesRead);
+								}
+								soundLine.drain();
+							}
+							catch (LineUnavailableException | IOException e)
+							{
+								e.printStackTrace();
+								functioning =false;
+							}
+							
+						}
+						while (functioning);
+					}
+				});
+				thread.start();
+			}
+		}
+		catch (UnsupportedAudioFileException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (URISyntaxException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
 	/**
-	 * Sets the base Image Icons in Memory. to be resized when used in the {@link #mapPanel}.
+	 * Sets the base Image Icons in Memory. to be resized when used in the
+	 * {@link #mapPanel}.
 	 */
 	private void fetchBaseIcons()
 	{
@@ -194,13 +267,14 @@ public class GraphicalUI extends UserInterface
 		baseIcons[3] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/invincibility.jpg"));
 		baseIcons[4] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/radar.png"));
 		baseIcons[5] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/briefcase.gif"));
-		baseIcons[6] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/room.jpg"));
+		baseIcons[6] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/room.png"));
 		baseIcons[7] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/fog.png"));
 		baseIcons[8] = new ImageIcon(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/whiteSquare.jpg"));
 	}
-	
+
 	/**
-	 * Creates the JPanel that contains the 9x9 Map. This does NOT Add the Panel to the JFrame
+	 * Creates the JPanel that contains the 9x9 Map. This does NOT Add the Panel
+	 * to the JFrame
 	 */
 	private void createMapPanel()
 	{
@@ -214,13 +288,13 @@ public class GraphicalUI extends UserInterface
 			{
 				Labelmap[x][y] = new JLabel(icons[8]);
 				mapPanel.add(Labelmap[x][y]);
-				oldmap[x][y] = '\u0000';
 			}
 		}
 	}
-	
+
 	/**
-	 * Creates the JPanel that contains the 4 option Main Menu. This does NOT Add the Panel to the JFrame
+	 * Creates the JPanel that contains the 4 option Main Menu. This does NOT
+	 * Add the Panel to the JFrame
 	 */
 	private void createMenuPanel()
 	{
@@ -273,9 +347,10 @@ public class GraphicalUI extends UserInterface
 		});
 		menuPanel.add(btnQuit, "cell 3 1,growx");
 	}
-	
+
 	/**
-	 * Creates the JPanel that presents the Player with 3 moves, save option, and Quit option. This does NOT Add the Panel to the JFrame.
+	 * Creates the JPanel that presents the Player with 3 moves, save option,
+	 * and Quit option. This does NOT Add the Panel to the JFrame.
 	 */
 	private void createPickTurnPanel()
 	{
@@ -344,9 +419,10 @@ public class GraphicalUI extends UserInterface
 		});
 		pickTurnPanel.add(btnQuit2, "cell 4 1,growx", -1);
 	}
-	
+
 	/**
-	 * Creates the JPanel that presents the User with 4 Directions. This does NOT Add the Panel to the JFrame
+	 * Creates the JPanel that presents the User with 4 Directions. This does
+	 * NOT Add the Panel to the JFrame
 	 */
 	private void createDirectionPanel()
 	{
@@ -398,8 +474,11 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Changes all of the cached Images of the Tokens to a Specified Size. Requires {@link #reloadMap()} to see Changes
-	 * @param size The horizontal pixel size of a single token
+	 * Changes all of the cached Images of the Tokens to a Specified Size.
+	 * Requires {@link #reloadMap()} to see Changes
+	 * 
+	 * @param size
+	 *            The horizontal pixel size of a single token
 	 */
 	private void setMapImageSize(int size)
 	{
@@ -416,7 +495,8 @@ public class GraphicalUI extends UserInterface
 	}
 
 	/**
-	 * Updates all JLabels on the Map, likely used in changing the size, doesn't swap any Images
+	 * Updates all JLabels on the Map, likely used in changing the size, doesn't
+	 * swap any Images
 	 */
 	private void reloadMap()
 	{
