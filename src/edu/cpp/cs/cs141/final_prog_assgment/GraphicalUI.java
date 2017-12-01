@@ -18,8 +18,12 @@ package edu.cpp.cs.cs141.final_prog_assgment;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,9 +45,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Port;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
@@ -98,6 +100,7 @@ public class GraphicalUI extends UserInterface
 	private JCheckBoxMenuItem chckbxmntmMuteMusic;
 	private JMenuItem mntmOpenFolder;
 	private JMenuItem mntmChangeImageResolution;
+	private AudioInputStream audioStream;
 
 	public GraphicalUI()
 	{
@@ -172,6 +175,21 @@ public class GraphicalUI extends UserInterface
 		menuBar.add(mntmOpenFolder);
 
 		chckbxmntmMuteMusic = new JCheckBoxMenuItem("Mute Music");
+		chckbxmntmMuteMusic.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (chckbxmntmMuteMusic.isSelected())
+				{
+					soundLine.stop();
+				}
+				else
+				{
+					soundLine.start();
+				}
+			}
+		});
 		menuBar.add(chckbxmntmMuteMusic);
 
 		scheduler = new Timer(1000, new ActionListener()
@@ -189,8 +207,8 @@ public class GraphicalUI extends UserInterface
 		});
 		System.out.println("JFrame Constructed");
 		frame.setVisible(true);
-		scheduler.start();
 		setupAudio();
+		scheduler.start();
 		welcomeMessage();
 	}
 
@@ -198,13 +216,16 @@ public class GraphicalUI extends UserInterface
 	{
 		try
 		{
+			
 			File audioFile = new File(getClass().getResource("/edu/cpp/cs/cs141/final_prog_assgment/background.wav").toURI());
-			System.out.println(audioFile.getAbsolutePath());
-			AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+			audioStream = AudioSystem.getAudioInputStream(audioFile);
 			AudioFormat format = audioStream.getFormat();
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 			if (AudioSystem.isLineSupported(info))
 			{
+				soundLine = (SourceDataLine) AudioSystem.getLine(info);
+				soundLine.open(format);
+				soundLine.start();
 				Thread thread = new Thread(new Runnable()
 				{
 					@Override
@@ -215,23 +236,32 @@ public class GraphicalUI extends UserInterface
 						{
 							try
 							{
-								soundLine = (SourceDataLine) AudioSystem.getLine(info);
-								soundLine.open(format);
-								soundLine.start();
-								byte[] bytesBuffer = new byte[4096];
-								int bytesRead = -1;
-								while ((bytesRead = audioStream.read(bytesBuffer)) != -1)
-								{
-									soundLine.write(bytesBuffer, 0, bytesRead);
-								}
+								audioStream = AudioSystem.getAudioInputStream(audioFile);
+								byte[] bytesBuffer = new byte[50];
+					            int bytesRead = -1;
+								while ((bytesRead = audioStream.read(bytesBuffer)) != -1) {
+					                soundLine.write(bytesBuffer, 0, bytesRead);
+					            }
 								soundLine.drain();
+								
 							}
-							catch (LineUnavailableException | IOException e)
+							catch (IOException | UnsupportedAudioFileException e)
 							{
 								e.printStackTrace();
-								functioning =false;
+								functioning = false;
 							}
-							
+							finally
+							{
+								try
+								{
+									audioStream.close();
+								}
+								catch (IOException e)
+								{
+									e.printStackTrace();
+								}
+							}
+
 						}
 						while (functioning);
 					}
@@ -245,12 +275,14 @@ public class GraphicalUI extends UserInterface
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		catch (URISyntaxException e1)
 		{
-			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		catch (LineUnavailableException e1)
+		{
 			e1.printStackTrace();
 		}
 	}
@@ -368,7 +400,27 @@ public class GraphicalUI extends UserInterface
 			}
 		});
 		pickTurnPanel.add(lblPickTurn, "flowy,cell 0 0 5 1,alignx center", -1);
-		JButton btnMove = new JButton("Move");
+		JButton btnMove = new JButton("Move")
+		{
+			@Override
+			protected void paintComponent(Graphics g)
+			{
+				if (this.isEnabled())
+				{
+					Graphics2D g2 = (Graphics2D) g.create();
+					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
+							Color.WHITE));
+					g2.fillRect(0, 0, getWidth(), getHeight() / 3);
+					g2.setPaint(new GradientPaint(new Point(0, getHeight() / 3), Color.WHITE, new Point(0, getHeight()),
+							getBackground()));
+					g2.fillRect(0, getHeight() / 3, getWidth(), getHeight());
+					g2.dispose();
+				}
+				super.paintComponent(g);
+			}
+		};
+		btnMove.setContentAreaFilled(false);
+		btnMove.setBackground(new Color(150, 255, 150));
 		btnMove.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -378,7 +430,27 @@ public class GraphicalUI extends UserInterface
 			}
 		});
 		pickTurnPanel.add(btnMove, "cell 0 1,growx", -1);
-		JButton btnLook = new JButton("Look");
+		JButton btnLook = new JButton("Look")
+		{
+			@Override
+			protected void paintComponent(Graphics g)
+			{
+				if (this.isEnabled())
+				{
+					Graphics2D g2 = (Graphics2D) g.create();
+					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
+							Color.WHITE));
+					g2.fillRect(0, 0, getWidth(), getHeight() / 3);
+					g2.setPaint(new GradientPaint(new Point(0, getHeight() / 3), Color.WHITE, new Point(0, getHeight()),
+							getBackground()));
+					g2.fillRect(0, getHeight() / 3, getWidth(), getHeight());
+					g2.dispose();
+				}
+				super.paintComponent(g);
+			}
+		};
+		btnLook.setContentAreaFilled(false);
+		btnLook.setBackground(new Color(255, 255, 100));
 		btnLook.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -388,7 +460,27 @@ public class GraphicalUI extends UserInterface
 			}
 		});
 		pickTurnPanel.add(btnLook, "cell 1 1,growx", -1);
-		JButton btnShoot = new JButton("Shoot");
+		JButton btnShoot = new JButton("Shoot")
+		{
+			@Override
+			protected void paintComponent(Graphics g)
+			{
+				if (this.isEnabled())
+				{
+					Graphics2D g2 = (Graphics2D) g.create();
+					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
+							Color.WHITE));
+					g2.fillRect(0, 0, getWidth(), getHeight() / 3);
+					g2.setPaint(new GradientPaint(new Point(0, getHeight() / 3), Color.WHITE, new Point(0, getHeight()),
+							getBackground()));
+					g2.fillRect(0, getHeight() / 3, getWidth(), getHeight());
+					g2.dispose();
+				}
+				super.paintComponent(g);
+			}
+		};
+		btnShoot.setContentAreaFilled(false);
+		btnShoot.setBackground(new Color(255, 200, 100));
 		btnShoot.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -408,7 +500,27 @@ public class GraphicalUI extends UserInterface
 			}
 		});
 		pickTurnPanel.add(btnSave, "cell 3 1,growx", -1);
-		JButton btnQuit2 = new JButton("Quit");
+		JButton btnQuit2 = new JButton("Quit")
+		{
+			@Override
+			protected void paintComponent(Graphics g)
+			{
+				if (this.isEnabled())
+				{
+					Graphics2D g2 = (Graphics2D) g.create();
+					g2.setPaint(new GradientPaint(new Point(0, 0), getBackground(), new Point(0, getHeight() / 3),
+							Color.WHITE));
+					g2.fillRect(0, 0, getWidth(), getHeight() / 3);
+					g2.setPaint(new GradientPaint(new Point(0, getHeight() / 3), Color.WHITE, new Point(0, getHeight()),
+							getBackground()));
+					g2.fillRect(0, getHeight() / 3, getWidth(), getHeight());
+					g2.dispose();
+				}
+				super.paintComponent(g);
+			}
+		};
+		btnQuit2.setContentAreaFilled(false);
+		btnQuit2.setBackground(new Color(255, 150, 150));
 		btnQuit2.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
