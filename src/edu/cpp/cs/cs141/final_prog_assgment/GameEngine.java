@@ -128,7 +128,9 @@ public class GameEngine {
 			}
 		}
 		else if (mainMenuOption == 3)
-			help();		
+			help();
+		else if(mainMenuOption == 4)
+			System.exit(0);
 	}
 
 	/**
@@ -280,6 +282,9 @@ public class GameEngine {
 			//TODO ui needs to add this 
 			saveGame(ui.querySaveFileName());
 			//System.exit(0); ???????????????
+		}
+		else if(choice == 5) {
+			System.exit(0);
 		}
 
 	}
