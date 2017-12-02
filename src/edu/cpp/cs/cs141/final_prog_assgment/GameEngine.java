@@ -142,8 +142,10 @@ public class GameEngine {
 		player = new Player();
 		numberOfNinjas = 6;
 		turnCount = 0;
+		invincibility = false;
 		victory = false;
 		gameOver = false;
+		radar = false;
 		playerLoc = game.getPlayerLoc();
 		getMapData();
 		hardmode = ui.offerDifficulty();
