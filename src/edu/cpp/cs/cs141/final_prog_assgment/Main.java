@@ -24,68 +24,15 @@ public class Main {
 	 * Start the Program/Game
 	 * 
 	 * @param args
-	 *            from commands to enable the gui
+	 *            from commands to enable the cui
 	 */
 	public static void main(String[] args) {
-		/*
-		GameEngine engine = new GameEngine();
-		engine.newGame();
-		*/
-		//Testing below//
-//		GameBoard b = new GameBoard();
-//		System.out.println(b.getPlayerLoc());
-		//b.qPrint();
-	//	b.displayData(false);
-		
-		
-//		System.out.println(b.checkFlag(72, 1, '1'));
-//		System.out.println(b.checkFlag(10, 1, '1'));
-//		System.out.println(b.checkFlag(10, 1, '0'));
-//		System.out.println(b.checkFlag(72, 1, '0'));
-//		//InProx
-//		System.out.println(b.inProxPlayer(64));
-//		System.out.println(b.inProxPlayer(54));
-//		System.out.println(b.inProxPlayer(63));
-//		System.out.println(b.inProxPlayer(72));
-//		System.out.println(b.inProxPlayer(73));
-//		System.out.println(b.inProxPlayer(74));
-//		System.out.println(b.inProxPlayer(21));
-//		System.out.println(b.inProxPlayer(49));
-//		System.out.println(b.inProxPlayer(10));
-//		//isRoom
-//		System.out.println(b.isRoom(10));
-//		System.out.println(b.isRoom(13));
-//		System.out.println(b.isRoom(16));
-//		System.out.println(b.isRoom(37));
-//		System.out.println(b.isRoom(40));
-//		System.out.println(b.isRoom(43));
-//		System.out.println(b.isRoom(64));
-//		System.out.println(b.isRoom(67));
-//		System.out.println(b.isRoom(70));
-//		
-//		System.out.println(b.isRoom(14));
-//		System.out.println(b.isRoom(1));
-//		System.out.println(b.isRoom(80));
-//		System.out.println(b.isRoom(78));
-//		System.out.println(b.isRoom(77));
-		
-//		UserInterface ui = new UserInterface();
-//		ui.printMap(b.getMapData(), 'f', false, false);
-//		ui.printMap(b.getMapData(), 'f', true, false);
-//		ui.printMap(b.getMapData(), 'f', false, true);
-//		ui.printMap(b.getMapData(), 'n', false, false);
-//		ui.printMap(b.getMapData(), 'e', false, false);
-		boolean guiUsed = false;
-		if(args.length == 1 && args[0].equals("-gui"))
-		{
-			guiUsed = true;
+		boolean guiUsed = true;
+		if (args.length == 1 && args[0].equals("-cui")) {
+			guiUsed = false;
 		}
 		GameEngine gameEngine = new GameEngine(guiUsed);
 		gameEngine.startGame();
-		
-//		GameBoard gameBoard = new GameBoard();
-//		UserInterface ui = new UserInterface();
-//		ui.printMap(gameBoard.getMapData(), 'f', false, false);
 	}
 
 }

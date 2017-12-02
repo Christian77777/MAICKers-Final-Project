@@ -16,13 +16,10 @@
 package edu.cpp.cs.cs141.final_prog_assgment;
 
 /**
- * This Class represents the User, and their charactor. Decisions for the Player
+ * This Class represents the User, and their character. Decisions for the Player
  * are made in the UI class, and verified by the Game Engine
  */
 public class Player extends Entities {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2091432889491962930L;
 	/**
 	 * if gun has single shot
@@ -90,7 +87,6 @@ public class Player extends Entities {
 	 */
 	@Override
 	public boolean isSpawnableHere() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

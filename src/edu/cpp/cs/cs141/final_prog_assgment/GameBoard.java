@@ -30,13 +30,14 @@ public class GameBoard implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -1601258203598047430L;
-	
+
 	private String[] board = new String[81];
+
 	/**
 	 * Puts Enemy in possible spaces Places Items in possible spaces
 	 */
 	public GameBoard() {
-		for(int i =0; i < board.length; i++) {
+		for (int i = 0; i < board.length; i++) {
 			board[i] = "000";
 		}
 		board[72] = "100"; // The player always starts at spot 72
@@ -47,27 +48,26 @@ public class GameBoard implements Serializable {
 		placeItem(ItemType.RADAR);
 		placeItem(ItemType.INVINC);
 		placeItem(ItemType.BULLET);
-		
+
 	}
-	
+
 	/**
-	 * Places a ninja in a spot on the board, rules for placing are as follows
-	 * 1. Cannot be placed in a room 2. Cannot be placed on another ninja 3. Cannot be placed
-	 * within 3 spaces of the player.
+	 * Places a ninja in a spot on the board, rules for placing are as follows 1.
+	 * Cannot be placed in a room 2. Cannot be placed on another ninja 3. Cannot be
+	 * placed within 3 spaces of the player.
 	 * 
-	 * Ninja place in data ("000") string is 3rd, 
-	 * 1 - true ninja is there(001)
-	 * 0 - false no ninja there.(000)
+	 * Ninja place in data ("000") string is 3rd, 1 - true ninja is there(001) 0 -
+	 * false no ninja there.(000)
 	 */
 	protected void placeNinja() {
 		boolean InvalidSpot = true;
 		Random r = new Random();
 		int num = r.nextInt(81);
-		while(InvalidSpot) {
+		while (InvalidSpot) {
 			num = r.nextInt(81);
-			if (!isRoom(num)) { 
-				if(!inProxPlayer(num)) { 
-					if(checkFlag(num, 3, '0')) {
+			if (!isRoom(num)) {
+				if (!inProxPlayer(num)) {
+					if (checkFlag(num, 3, '0')) {
 						InvalidSpot = false;
 					}
 				}
@@ -75,24 +75,25 @@ public class GameBoard implements Serializable {
 		}
 		setFlag(num, 3, '1');
 	}
-	
+
 	/**
-	 * Places an item in a spot on the board, rules for placing are as follows
-	 * 1. Cannot be placed on player 2. Cannot be placed in room if not Briefcase 
-	 * 3. If Briefcase MUST be placed in room 4. Cannot be placed in spot with another item
+	 * Places an item in a spot on the board, rules for placing are as follows 1.
+	 * Cannot be placed on player 2. Cannot be placed in room if not Briefcase 3. If
+	 * Briefcase MUST be placed in room 4. Cannot be placed in spot with another
+	 * item
 	 * 
-	 * Item place in data ("000") string is 2nd, 
-	 * 0 - No item present (000)
-	 * a - item present is ammo (0a0)
-	 * i - item present is invincibility (0i0)
-	 * r - item present is radar (0r0)
-	 * b - item present is Briefcase (0b0)
+	 * Item place in data ("000") string is 2nd, 0 - No item present (000) a - item
+	 * present is ammo (0a0) i - item present is invincibility (0i0) r - item
+	 * present is radar (0r0) b - item present is Briefcase (0b0)
+	 * 
+	 * @param type
+	 *            Item Type To Place
 	 */
 	private void placeItem(ItemType type) {
 		boolean InvalidSpot = true;
 		Random r = new Random();
 		int num = r.nextInt(81);
-		if(type == ItemType.BRIEFCASE) {
+		if (type == ItemType.BRIEFCASE) {
 			num = r.nextInt(9);
 			switch (num) {
 			case 0:
@@ -124,10 +125,10 @@ public class GameBoard implements Serializable {
 				break;
 			}
 		} else {
-			while(InvalidSpot) {			
+			while (InvalidSpot) {
 				num = r.nextInt(81);
-				if (!isRoom(num)) { 
-					if(!checkFlag(num, 2, 'a') && !checkFlag(num, 2, 'i') && !checkFlag(num, 2, 'r') && num != 72) { 
+				if (!isRoom(num)) {
+					if (!checkFlag(num, 2, 'a') && !checkFlag(num, 2, 'i') && !checkFlag(num, 2, 'r') && num != 72) {
 						InvalidSpot = false;
 					}
 				}
@@ -141,65 +142,81 @@ public class GameBoard implements Serializable {
 				break;
 			case RADAR:
 				setFlag(num, 2, 'r');
-				break;				
+				break;
+			case BRIEFCASE:
+				break;
+			default:
+				break;
 			}
 		}
 	}
-	
-	/**
-	 * Takes the board value at spot of three characters and sets the char at flagNumber to i.
 
-	 * @param spot - spot on board to be changed.
-	 * @param flagNumber - which flag to set 1-3
-	 * @param i - what to set flag to.
+	/**
+	 * Takes the board value at spot of three characters and sets the char at
+	 * flagNumber to i.
+	 * 
+	 * @param spot
+	 *            - spot on board to be changed.
+	 * @param flagNumber
+	 *            - which flag to set 1-3
+	 * @param i
+	 *            - what to set flag to.
 	 */
 	protected void setFlag(int spot, int flagNumber, char i) {
 		char tmp1 = board[spot].charAt(0);
 		char tmp2 = board[spot].charAt(1);
 		char tmp3 = board[spot].charAt(2);
-		if(flagNumber == 1) {
+		if (flagNumber == 1) {
 			board[spot] = "" + i + tmp2 + tmp3;
-		}else if (flagNumber == 2) {
+		} else if (flagNumber == 2) {
 			board[spot] = "" + tmp1 + i + tmp3;
-		}else
+		} else
 			board[spot] = "" + tmp1 + tmp2 + i;
 	}
-	
+
 	/**
 	 * Checks flagNumber at spot on the board to see if it equals i.
-
-	 * @param spot - spot on board to be checked.
-	 * @param flagNumber - which flag to check 1-3
-	 * @param i - what to compare the flag to
+	 * 
+	 * @param spot
+	 *            - spot on board to be checked.
+	 * @param flagNumber
+	 *            - which flag to check 1-3
+	 * @param i
+	 *            - what to compare the flag to
 	 * @return true - if flag == i otherwise false
 	 */
-	protected boolean checkFlag(int spot, int flagNumber, char i)
-	{
+	protected boolean checkFlag(int spot, int flagNumber, char i) {
 		return (board[spot].charAt(flagNumber - 1) == i);
 	}
 
 	/**
-	 * checks if spot in array is in proximity
-	 * to the player (within 3 spaces).
-	 * @param i - the spot to check
+	 * checks if spot in array is in proximity to the player (within 3 spaces).
+	 * 
+	 * @param i
+	 *            the spot to check
+	 * @return if Player is in Proximity
 	 */
 	private boolean inProxPlayer(int i) {
-		if(i == 72 || i == 73 || i == 74 || i == 63 || i == 54 || i == 55 || i == 56 || i == 64 || i == 65) {
+		if (i == 72 || i == 73 || i == 74 || i == 63 || i == 54 || i == 55 || i == 56 || i == 64 || i == 65) {
 			return true;
-		}else
+		} else
 			return false;
 	}
+
 	/**
 	 * checks if spot in array is a room.
-	 * @param i - the spot to check
+	 * 
+	 * @param i
+	 *            the spot to check
+	 * @return if the spot is a room
 	 */
-	protected boolean isRoom(int i){			
-		if(i == 10 || i == 13 || i == 16 || i == 37 || i == 40 || i == 43 || i == 64 || i == 67 || i == 70) {
+	protected boolean isRoom(int i) {
+		if (i == 10 || i == 13 || i == 16 || i == 37 || i == 40 || i == 43 || i == 64 || i == 67 || i == 70) {
 			return true;
-		}else
+		} else
 			return false;
 	}
-	
+
 	/**
 	 * 
 	 * @return the array of strings that hold the data for the map
@@ -207,32 +224,36 @@ public class GameBoard implements Serializable {
 	protected String[] getMapData() {
 		return board;
 	}
-	
+
 	/**
-	 * Loops through board array and checks for player position
-	 * shouldn't ever return -1.
+	 * Loops through board array and checks for player position shouldn't ever
+	 * return -1.
+	 * 
 	 * @return int of player's location
 	 */
 	protected int getPlayerLoc() {
-		for (int i=0; i < 81; i++) {
+		for (int i = 0; i < 81; i++) {
 			if (checkFlag(i, 1, '1')) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	
+
 	/**
-	 * Loops through board array, finds how many ninjas are on the board and
-	 * places their locations into an appropriately sized array
+	 * Loops through board array, finds how many ninjas are on the board and places
+	 * their locations into an appropriately sized array
+	 * 
+	 * @param numberOfNinjas
+	 *            number of ninjas left alive
 	 * @return int array with all ninja locations
 	 */
 	protected int[] getNinjaLoc(int numberOfNinjas) {
 		int[] ninjaLoc = new int[numberOfNinjas];
 		int j = 0;
-		for (int i=0; i<81; i++) {
-			if (checkFlag(i, 3, '1')) { 
-				ninjaLoc[j]=i;
+		for (int i = 0; i < 81; i++) {
+			if (checkFlag(i, 3, '1')) {
+				ninjaLoc[j] = i;
 				j++;
 			}
 		}
